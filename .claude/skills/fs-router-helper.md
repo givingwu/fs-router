@@ -337,3 +337,101 @@ If the new route has a layout and the parent doesn't have a link to it, suggest 
 
 Run: `find src/routes -type f -name "*.tsx" -o -name "*.ts" | sort`
 Display the new file structure to user.
+
+## Module 3: Debug Issues
+
+### Trigger
+- User keywords: "不工作", "错误", "问题", "调试", "debug", "404", "blank"
+- Project state: Any (active routes project)
+
+### Diagnostic Steps
+
+Run each check and report findings:
+
+#### Check 1: Build Configuration
+
+```bash
+# Check if fs-router plugin is configured
+if [ -f "vite.config.ts" ]; then
+  grep -i "fs-router\|FileBasedRouter" vite.config.ts || echo "❌ fs-router plugin not found in vite.config.ts"
+elif [ -f "rspack.config.js" ]; then
+  grep -i "fs-router\|FileBasedRouter" rspack.config.js || echo "❌ fs-router plugin not found in rspack.config.js"
+elif [ -f "webpack.config.js" ]; then
+  grep -i "fs-router\|FileBasedRouter" webpack.config.js || echo "❌ fs-router plugin not found in webpack.config.js"
+else
+  echo "❌ No build configuration found"
+fi
+```
+
+**If missing:** Provide the correct configuration snippet from Module 1.
+
+#### Check 2: Routes Directory
+
+```bash
+if [ -d "src/routes" ]; then
+  echo "✅ src/routes directory exists"
+  find src/routes -type f \( -name "*.tsx" -o -name "*.ts" \) | head -20
+else
+  echo "❌ src/routes directory not found"
+fi
+```
+
+**If missing:** Run Module 1 to initialize.
+
+#### Check 3: Generated Routes File
+
+```bash
+if [ -f "src/routes.tsx" ] || [ -f "src/routes.ts" ]; then
+  echo "✅ Generated routes file exists"
+  head -30 "$(find src -maxdepth 1 -name 'routes.ts*')"
+else
+  echo "❌ Generated routes file not found"
+  echo "💡 Try restarting your dev server to regenerate routes"
+fi
+```
+
+#### Check 4: Required Root Layout
+
+```bash
+if [ -f "src/routes/layout.tsx" ]; then
+  if grep -q "Outlet" src/routes/layout.tsx; then
+    echo "✅ Root layout with Outlet found"
+  else
+    echo "⚠️ Root layout missing <Outlet /> component"
+  fi
+else
+  echo "❌ src/routes/layout.tsx not found (required)"
+fi
+```
+
+#### Check 5: Main Entry Point
+
+```bash
+if [ -f "src/main.tsx" ]; then
+  if grep -q "routes" src/main.tsx; then
+    echo "✅ main.tsx imports routes"
+  else
+    echo "⚠️ main.tsx may not be using generated routes"
+    echo "💡 Ensure you have: import { routes } from './routes'"
+  fi
+else
+  echo "❌ src/main.tsx not found"
+fi
+```
+
+#### Check 6: Dependencies
+
+```bash
+echo "Checking dependencies..."
+grep -E "(react|react-router-dom|@feoe/fs-router)" package.json || echo "❌ Missing dependencies"
+```
+
+### Common Issues and Solutions
+
+| Issue | Solution |
+|-------|----------|
+| Routes 404 | Check build config has fs-router plugin |
+| Type errors | Delete src/routes.tsx and restart dev server |
+| Blank page | Check root layout has <Outlet /> |
+| Hot reload not working | Restart dev server |
+| Dynamic params not working | Check useParams usage with correct param name |
