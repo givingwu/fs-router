@@ -5,14 +5,14 @@
 
 [![npm version](https://img.shields.io/npm/v/@feoe/fs-router.svg)](https://www.npmjs.com/package/@feoe/fs-router)
 [![npm downloads](https://img.shields.io/npm/dm/@feoe/fs-router.svg)](https://www.npmjs.com/package/@feoe/fs-router)
-[![license](https://img.shields.io/npm/l/@feoe/fs-router.svg)](https://github.com/knfeoe/fs-router/blob/main/LICENSE)
+[![license](https://img.shields.io/npm/l/@feoe/fs-router.svg)](https://github.com/givingwu/fs-router/blob/main/LICENSE)
 
 
 **基于文件的约定式路由**
 
 为 React 应用提供类型安全的路由解决方案
 
-[文档](https://knfeoe.github.io/fs-router/) | [快速开始](#-安装) | [示例](#-示例)
+[文档](https://givingwu.github.io/fs-router/) | [快速开始](#-安装) | [示例](#-示例)
 
 </div>
 
@@ -219,7 +219,7 @@ navigate('/invalid')    // ❌ TypeScript 错误
 
 ## 📚 文档
 
-完整的文档和 API 参考请访问：[https://knfeoe.github.io/fs-router/](https://knfeoe.github.io/fs-router/)
+完整的文档和 API 参考请访问：[https://givingwu.github.io/fs-router/](https://givingwu.github.io/fs-router/)
 
 - [介绍](/docs/guide/start/introduction.md)
 - [快速开始](/docs/guide/start/getting-started.md)
@@ -243,4 +243,4 @@ navigate('/invalid')    // ❌ TypeScript 错误
 
 ## 📄 许可证
 
-[MIT](./LICENSE) © [feoe](https://github.com/feoe)
+[MIT](./LICENSE) © [givingwu](https://github.com/givingwu)

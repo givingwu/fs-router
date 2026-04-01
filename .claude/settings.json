@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/cheng/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.5/skills/subagent-driven-development/**)"
+    ],
+    "additionalDirectories": [
+      "/Users/cheng/Development/WorkSpace/feoe/fs-router/.claude"
+    ]
+  }
+}

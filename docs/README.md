@@ -31,11 +31,16 @@ docs/
 │   ├── theme/                 # 自定义主题
 │   └── public/                # 静态资源
 ├── guide/                     # 使用指南
+│   ├── start/                 # 快速开始
+│   ├── basic/                 # 基础教程
+│   ├── advanced/              # 高级教程
+│   ├── configuration/         # 配置说明
+│   └── faq/                   # 常见问题
 ├── api/                       # API 参考
 ├── examples/                  # 示例和教程
-├── concepts/                  # 核心概念
 ├── migration/                 # 迁移指南
-└── contributing/              # 贡献指南
+├── contributing/              # 贡献指南
+└── deployment-guide.md        # 部署指南
 ```
 
 ## 贡献

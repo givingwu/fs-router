@@ -1,14 +1,14 @@
 {
 	"name": "@feoe/fs-router",
 	"version": "0.0.11",
-	"author": "https://github.com/KNFEOE",
-	"homepage": "https://knfeoe.github.io/fs-router",
+	"author": "https://github.com/givingwu",
+	"homepage": "https://givingwu.github.io/fs-router",
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/KNFEOE/fs-router.git"
+		"url": "git+https://github.com/givingwu/fs-router.git"
 	},
 	"bugs": {
-		"url": "https://github.com/KNFEOE/fs-router/issues"
+		"url": "https://github.com/givingwu/fs-router/issues"
 	},
 	"description": "file system based routing",
 	"keywords": [

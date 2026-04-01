@@ -10,4 +10,4 @@
 
 ## 完整示例项目
 
-所有示例项目都可以在 [GitHub 仓库](https://github.com/knfeoe/fs-router/tree/master/examples) 中找到。
+所有示例项目都可以在 [GitHub 仓库](https://github.com/givingwu/fs-router/tree/master/examples) 中找到。

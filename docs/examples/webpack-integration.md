@@ -57,3 +57,7 @@ module.exports = merge(common, {
   },
 })
 ```
+
+## 完整示例
+
+查看完整的 Webpack 集成示例：[GitHub 示例](https://github.com/givingwu/fs-router/tree/master/examples)
