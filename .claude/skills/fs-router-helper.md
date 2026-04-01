@@ -238,3 +238,102 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>
 )
 ```
+
+## Module 2: Add Page/Route
+
+### Trigger
+- User keywords: "添加页面", "新建路由", "add page", "create route", "添加"
+- Project state: `HAS_ROUTES_DIR == true`
+
+### Steps
+
+1. **Parse the requested path**
+
+Ask: "请输入页面路径（例如：/about, /users/[id], /dashboard/settings）"
+
+Parse logic:
+- Split by `/` to get segments
+- Identify dynamic segments (wrapped in `[]`)
+- Build directory structure
+
+2. **Ask for optional components**
+
+For each new route, ask:
+- 是否需要 layout.tsx？
+- 是否需要 loading.tsx？
+- 是否需要 error.tsx？
+- 是否需要 data loader (*.data.ts)？
+
+3. **Create the file structure**
+
+Example: For path `/users/[id]/posts`
+
+```bash
+mkdir -p src/routes/users/[id]/posts
+```
+
+Create files:
+
+#### src/routes/users/[id]/posts/page.tsx
+```tsx
+// 基于 useParams 获取动态参数
+import { useParams } from 'react-router-dom'
+
+export default function PostsPage() {
+  const { id } = useParams<{ id: string }>()
+
+  return (
+    <div>
+      <h1>用户 {id} 的文章</h1>
+      <p>编辑 src/routes/users/[id]/posts/page.tsx 来修改此页面</p>
+    </div>
+  )
+}
+```
+
+#### src/routes/users/[id]/layout.tsx (if requested)
+```tsx
+import { Outlet, useParams } from 'react-router-dom'
+
+export default function UserLayout() {
+  const { id } = useParams<{ id: string }>()
+
+  return (
+    <div>
+      <aside>用户 {id} 的侧边栏</aside>
+      <Outlet />
+    </div>
+  )
+}
+```
+
+#### src/routes/users/[id]/loading.tsx (if requested)
+```tsx
+export default function UserLoading() {
+  return <div>加载中...</div>
+}
+```
+
+#### src/routes/users/[id]/error.tsx (if requested)
+```tsx
+import { useRouteError } from 'react-router-dom'
+
+export default function UserError() {
+  const error = useRouteError()
+  return (
+    <div>
+      <h2>加载失败</h2>
+      <p>{String(error)}</p>
+    </div>
+  )
+}
+```
+
+4. **Update parent layout (if needed)**
+
+If the new route has a layout and the parent doesn't have a link to it, suggest adding navigation link.
+
+5. **Verify created files**
+
+Run: `find src/routes -type f -name "*.tsx" -o -name "*.ts" | sort`
+Display the new file structure to user.
