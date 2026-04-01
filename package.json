@@ -88,5 +88,5 @@
 		"react": "^18.2.0"
 	},
 	"license": "MIT",
-	"packageManager": "pnpm"
+	"packageManager": "pnpm@9.15.0"
 }
