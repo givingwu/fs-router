@@ -14,6 +14,6 @@
 3. **代码贡献** - 提交 Pull Request 修复问题或添加功能
 4. **文档改进** - 帮助改进文档内容
 
-## 行为准则
+## 开发指南
 
-请遵循我们的 [行为准则](https://github.com/givingwu/fs-router/blob/master/CODE_OF_CONDUCT.md)，营造友好的社区环境。
+详细的开发环境搭建和开发流程请查看 [开发文档](./development.md)。

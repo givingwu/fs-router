@@ -6,7 +6,7 @@
 
 在开始开发之前，请确保你的开发环境满足以下要求：
 
-- **Node.js**: >= 18.0.0
+- **Node.js**: >= 16.0.0
 - **pnpm**: >= 8.0.0（本项目使用 pnpm 作为包管理器）
 - **Git**: 最新版本
 
@@ -30,15 +30,25 @@ pnpm install
 ```
 fs-router/
 ├── src/                      # 源代码目录
-│   ├── plugin/              # 构建工具插件
+│   ├── core/               # 核心解析逻辑
+│   │   ├── path-parser.ts       # 路径解析
+│   │   └── route-file-parser.ts # 路由文件解析
+│   ├── hooks/              # React Hooks
+│   │   └── use-navigation.ts
+│   ├── plugin/             # 构建工具插件
+│   │   ├── factory.ts      # 插件工厂 (unplugin)
 │   │   ├── vite.ts         # Vite 插件
 │   │   ├── rspack.ts       # Rspack 插件
 │   │   └── webpack.ts      # Webpack 插件
-│   ├── utils/              # 工具函数
-│   └── index.ts            # 主入口
+│   ├── router/             # 路由生成核心
+│   │   ├── extractor.ts    # 路由文件提取
+│   │   ├── generator.ts    # 路由配置生成
+│   │   └── templates.ts    # 代码模板
+│   └── types/              # 类型定义
 ├── docs/                    # 文档目录
 ├── examples/                # 示例项目
 ├── tests/                   # 测试文件
+├── AGENTS.md                # AI Agent 开发指南
 ├── package.json
 ├── tsconfig.json
 └── rslib.config.ts         # 构建配置

@@ -51,6 +51,7 @@
 		"build": "rslib build",
 		"dev": "rslib build --watch",
 		"test": "vitest run",
+		"test:watch": "vitest",
 		"prepare": "simple-git-hooks",
 		"prepublishOnly": "pnpm test && pnpm build",
 		"docs:dev": "rspress dev docs",
