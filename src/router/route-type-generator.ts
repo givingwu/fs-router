@@ -1,5 +1,4 @@
 import { glob } from "glob";
-import path from "node:path";
 import fs from "node:fs";
 import { pathParser } from "../core/path-parser";
 
@@ -37,7 +36,7 @@ export async function generateRouteType(options: TypeGenerateOptions) {
 
 		allFiles.push(
 			...relatedFiles.map((file) =>
-				route.prefix ? path.join(route.prefix, file) : file,
+				route.prefix ? `${route.prefix}/${file}` : file,
 			),
 		);
 	}

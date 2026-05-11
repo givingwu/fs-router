@@ -174,7 +174,9 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 			},
 
 			handleHotUpdate({ file }) {
-				if (file.startsWith(ctx.config.routesDirectory)) {
+				const normalizedFile = normalize(file);
+				const normalizedRoutesDir = normalize(ctx.config.routesDirectory);
+				if (normalizedFile.startsWith(normalizedRoutesDir)) {
 					return [];
 				}
 			},

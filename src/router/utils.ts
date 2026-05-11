@@ -16,7 +16,7 @@ export const replaceWithAlias = (
   alias: string
 ): string => {
   const relativePath = path.relative(basePath, filePath);
-  return path.join(alias, relativePath);
+  return normalizeToPosixPath(path.join(alias, relativePath));
 };
 
 export const normalizeToPosixPath = (str: string): string => {
