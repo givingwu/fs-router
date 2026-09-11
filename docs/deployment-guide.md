@@ -2,7 +2,9 @@
 
 ## 自动部署
 
-本项目使用 GitHub Actions 自动部署文档到 GitHub Pages。每当代码推送到 `master` 分支时，会自动触发部署流程。
+本项目使用 GitHub Actions 自动部署文档到 GitHub Pages。每当代码推送到 `main` 分支时，会自动触发部署流程。
+
+文档地址：[https://givingwu.github.io/fs-router/](https://givingwu.github.io/fs-router/)
 
 ## 首次设置
 
@@ -12,7 +14,7 @@
 2. Source 选择 "GitHub Actions"
 3. 保存设置
 
-完成设置后，工作流会自动启用并配置 GitHub Pages。
+完成设置后，推送到 `main` 或手动运行工作流即可部署。首次启用需要仓库管理员操作；工作流默认的 `GITHUB_TOKEN` 只能部署已启用的站点，不能通过 `enablement: true` 完成首次启用。
 
 ### 部署状态
 
@@ -21,17 +23,17 @@
 ### 部署流程
 
 1. **触发条件**：
-   - 推送到 `master` 分支
-   - 修改 `docs/` 目录下的文件
-   - 手动触发（在 Actions 页面）
+   - 推送到 `main` 分支（不限于 `docs/` 目录的修改）
+   - 手动触发（在 Actions 页面选择 `main`）
 
 2. **构建步骤**：
-   - 设置 Node.js 18 环境
+   - 检查 GitHub Pages 是否已启用
+   - 设置 Node.js 22 环境
    - 安装 pnpm 包管理器
    - 缓存依赖以提高构建速度
-   - 安装项目依赖
+   - 按锁文件安装项目依赖（`pnpm install --frozen-lockfile`）
    - 构建 RSPress 文档
-   - 部署到 GitHub Pages
+   - 上传 `doc_build` 目录并部署到 GitHub Pages
 
 ## 故障排除
 
@@ -54,6 +56,8 @@
 - 确保仓库设置中启用了 GitHub Pages
 - 在 Settings > Pages 中选择 "GitHub Actions" 作为部署源
 - 检查工作流文件中的权限配置
+
+如果 `Setup Pages` 报 `Get Pages site failed` 或 `Not Found`，先由仓库管理员完成上述首次设置，再重新运行工作流。无需将个人访问令牌添加到部署工作流。
 
 #### 3. 页面无法访问
 
@@ -80,7 +84,7 @@
 1. 进入 GitHub 仓库的 Actions 页面
 2. 选择 "Deploy Documentation" 工作流
 3. 点击 "Run workflow" 按钮
-4. 选择 `master` 分支并确认运行
+4. 选择 `main` 分支并确认运行
 
 ### 本地测试
 
@@ -88,7 +92,7 @@
 
 ```bash
 # 安装依赖
-pnpm install
+pnpm install --frozen-lockfile
 
 # 构建文档
 pnpm docs:build
