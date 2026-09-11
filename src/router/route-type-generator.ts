@@ -1,5 +1,5 @@
-import { glob } from "glob";
 import fs from "node:fs";
+import { glob } from "glob";
 import { pathParser } from "../core/path-parser";
 
 export interface RouteDirectory {

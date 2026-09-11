@@ -1,0 +1,8 @@
+# Only the library/docs root is managed here; examples are independent projects.
+packages:
+  - .
+
+# esbuild verifies its platform binary during installation. All other dependency
+# lifecycle scripts remain denied unless reviewed and added here.
+onlyBuiltDependencies:
+  - esbuild

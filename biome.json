@@ -1,3 +1,39 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.8.0/schema.json"
+	"$schema": "https://biomejs.dev/schemas/2.5.13/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"includes": [
+			"src/**",
+			"tests/**/*.test.ts",
+			"scripts/**",
+			"*.json",
+			"*.ts",
+			"docs/.rspress/**",
+			"!!examples",
+			"!!.agents",
+			"!!.claude",
+			"!!.vscode",
+			"!skills-lock.json"
+		]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended"
+		}
+	},
+	"formatter": {
+		"enabled": true
+	},
+	"assist": {
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	}
 }

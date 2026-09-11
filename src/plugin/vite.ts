@@ -1,6 +1,6 @@
 import { createVitePlugin } from "unplugin";
-import { unpluginRouterGeneratorFactory } from "./factory";
 import type { PluginConfig } from "./config";
+import { unpluginRouterGeneratorFactory } from "./factory";
 
 /**
  * @example

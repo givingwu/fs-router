@@ -88,14 +88,18 @@ pnpm docs:dev
 ### 发布前
 
 ```bash
-# 完整构建
+# 质量检查与完整构建（Node.js 22/24 LTS，pnpm 10.34.5）
+pnpm check
+pnpm typecheck
 pnpm build
+pnpm check:package
 
 # 运行测试
 pnpm test
 
 # 文档构建
 pnpm docs:build
+pnpm docs:check
 ```
 
 ---

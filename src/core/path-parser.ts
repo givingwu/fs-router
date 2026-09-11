@@ -18,7 +18,12 @@ export function pathParser(path: string): PathParserResult {
 
 	// 过滤掉 (group) 分组和 __开头的目录，并处理每个路径段
 	const processedSegments = pathSegments
-		.filter((segment) => !segment.startsWith("(") && !segment.endsWith(")") && !segment.startsWith("__"))
+		.filter(
+			(segment) =>
+				!segment.startsWith("(") &&
+				!segment.endsWith(")") &&
+				!segment.startsWith("__"),
+		)
 		.map((segment) => {
 			// 处理可选参数 [param$]
 			const optionalMatch = segment.match(/^\[([.\w]+)\$\]$/);
@@ -90,4 +95,3 @@ export function pathParser(path: string): PathParserResult {
 		params,
 	};
 }
-

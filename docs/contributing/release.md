@@ -24,8 +24,8 @@
 
 ```bash
 git fetch origin
-git checkout master
-git merge origin/master
+git checkout main
+git merge origin/main
 ```
 
 ### 2. 更新版本号
@@ -75,13 +75,13 @@ git commit -m "chore: release v0.0.12"
 确保所有测试通过：
 
 ```bash
-pnpm test
+pnpm check && pnpm typecheck && pnpm test
 ```
 
 ### 6. 构建
 
 ```bash
-pnpm build
+pnpm build && pnpm check:package
 ```
 
 ### 7. 发布到 npm
@@ -93,7 +93,7 @@ pnpm publish
 ### 8. 推送标签到 GitHub
 
 ```bash
-git push origin master
+git push origin main
 git push origin v0.0.12
 ```
 
@@ -116,7 +116,7 @@ git push origin v0.0.12
 - [ ] 文档是最新的
 - [ ] 示例项目能正常运行
 - [ ] 没有未提交的更改
-- [ ] 当前分支是 `master`
+- [ ] 当前分支是 `main`
 - [ ] 已拉取最新的远程更改
 
 ## 发布后
@@ -129,7 +129,7 @@ git push origin v0.0.12
 pnpm docs:build
 ```
 
-文档会自动部署到 GitHub Pages。
+本地构建只生成文件；合并并推送到 `main` 后，文档部署工作流才会自动发布到 GitHub Pages。
 
 ### 2. 通知用户
 
@@ -143,7 +143,7 @@ pnpm docs:build
 
 如果发现问题需要回滚：
 
-1. **npm 回滚**（发布后 72 小时内）：
+1. **标记问题版本为弃用**（不会删除或撤回已安装的包）：
 
 ```bash
 npm deprecate @feoe/fs-router@"0.0.12" "Critical bug, please use 0.0.11"
