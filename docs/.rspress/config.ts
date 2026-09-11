@@ -61,7 +61,7 @@ export default defineConfig({
 			},
 		],
 		editLink: {
-			docRepoBaseUrl: "https://github.com/givingwu/fs-router/tree/master/docs",
+			docRepoBaseUrl: "https://github.com/givingwu/fs-router/tree/main/docs",
 			text: "📝 在 GitHub 上编辑此页",
 		},
 		lastUpdated: true,
