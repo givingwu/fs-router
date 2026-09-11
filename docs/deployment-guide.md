@@ -27,13 +27,18 @@
    - 手动触发（在 Actions 页面选择 `main`）
 
 2. **构建步骤**：
-   - 检查 GitHub Pages 是否已启用
-   - 设置 Node.js 22 环境
+   - 设置 Node.js 24 LTS 环境
    - 安装 pnpm 包管理器
-   - 缓存依赖以提高构建速度
    - 按锁文件安装项目依赖（`pnpm install --frozen-lockfile`）
    - 构建 RSPress 文档
-   - 上传 `doc_build` 目录并部署到 GitHub Pages
+   - 验证 `/fs-router/` 路径与本地静态资源，上传 `doc_build`
+
+3. **发布步骤**：
+   - 独立 `deploy` job 使用 `github-pages` 环境，仅此 job 持有 `pages: write` 和 `id-token: write`
+   - 发布 job 不检出代码、不安装依赖，仅部署同一次 main 工作流的构建产物
+   - fork PR 只触发只读 CI；部署还校验仓库名及 `refs/heads/main`
+
+所有直接使用的 Actions 固定到官方仓库完整 commit SHA，版本由 Dependabot 跟踪。
 
 ## 故障排除
 
@@ -57,7 +62,7 @@
 - 在 Settings > Pages 中选择 "GitHub Actions" 作为部署源
 - 检查工作流文件中的权限配置
 
-如果 `Setup Pages` 报 `Get Pages site failed` 或 `Not Found`，先由仓库管理员完成上述首次设置，再重新运行工作流。无需将个人访问令牌添加到部署工作流。
+如果部署报站点未启用或 `Not Found`，先由仓库管理员完成上述首次设置，再重新运行工作流。无需将个人访问令牌添加到部署工作流。
 
 #### 3. 页面无法访问
 
@@ -96,6 +101,7 @@ pnpm install --frozen-lockfile
 
 # 构建文档
 pnpm docs:build
+pnpm docs:check
 
 # 预览构建结果
 pnpm docs:preview

@@ -20,7 +20,7 @@ export function DefaultErrorBoundary() {
     </div>
   );
 }
-`
+`;
 
 export const DefaultLoadingFallback = `
 import { Suspense } from 'react';
@@ -28,4 +28,4 @@ import { Suspense } from 'react';
 export const DefaultLoadingFallback = () => (
   <Suspense fallback={<div>Loading...</div>} />
 );
-`
+`;

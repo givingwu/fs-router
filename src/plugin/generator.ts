@@ -1,8 +1,8 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import type { PluginConfig } from "./config";
-import { RouteExtractor, RouteCodeGenerator } from "../router";
+import { RouteCodeGenerator, RouteExtractor } from "../router";
 import { generateRouteType } from "../router/route-type-generator";
+import type { PluginConfig } from "./config";
 
 export async function generator(config: PluginConfig) {
 	// Extract routes
@@ -28,7 +28,8 @@ export async function generator(config: PluginConfig) {
 	}
 
 	if (config.typeGenerateOptions) {
-		const { routesTypeFile, routesDirectories = [] } = config.typeGenerateOptions;
+		const { routesTypeFile, routesDirectories = [] } =
+			config.typeGenerateOptions;
 		if (routesDirectories.length > 0) {
 			await generateRouteType({
 				routesTypeFile,

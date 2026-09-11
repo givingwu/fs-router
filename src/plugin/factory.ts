@@ -1,11 +1,9 @@
-import type { UnpluginFactory } from "unplugin";
-import path, { isAbsolute, normalize, resolve, join } from "node:path";
+import path, { isAbsolute, join, normalize, resolve } from "node:path";
 import type { ChokidarOptions, FSWatcher } from "chokidar";
+import type { UnpluginFactory } from "unplugin";
+import { getConfig, type PluginConfig } from "./config";
 import { generator } from "./generator";
-import { defaultConfig, getConfig, type PluginConfig } from "./config";
 
-const VIRTUAL_ROUTE_ID = "virtual:generated-routes";
-const RESOLVED_VIRTUAL_ROUTE_ID = `\0${VIRTUAL_ROUTE_ID}`;
 const PLUGIN_NAME = "unplugin:file-based-router-generator";
 
 export interface RouterGeneratorPluginContext {
@@ -50,7 +48,7 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 			return content;
 		} catch (err) {
 			console.error(`❌ [${PLUGIN_NAME}] Route generation failed:`, err);
-			return "export const routes = [];";
+			throw err;
 		} finally {
 			ctx.lock = false;
 		}
@@ -90,7 +88,7 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 
 		const watchOptions: ChokidarOptions = {
 			ignored: [
-				/(^|[\/\\])\../,
+				/(^|[/\\])\../,
 				"node_modules",
 				"**/*.d.ts",
 				"**/styles/**",
@@ -116,7 +114,12 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 			};
 		};
 
-		const debouncedGenerate = debounce(() => run(generate), 300);
+		// Watch events have no bundler promise to reject; report and keep watching.
+		const debouncedGenerate = debounce(() => {
+			void run(generate).catch(() => {
+				// generate() already reported the error; a later edit can recover.
+			});
+		}, 300);
 
 		ctx.watcher
 			.on("add", debouncedGenerate)
@@ -146,18 +149,6 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 				await handleFile(id, event);
 			});
 		},
-
-		// resolveId(id: string) {
-		//   return id === VIRTUAL_ROUTE_ID ? RESOLVED_VIRTUAL_ROUTE_ID : undefined;
-		// },
-
-		// load(id: string) {
-		// 	if (id === RESOLVED_VIRTUAL_ROUTE_ID) {
-		// 		return generate();
-		// 	}
-
-		// 	return null;
-		// },
 
 		vite: {
 			async configResolved(config) {
@@ -190,10 +181,6 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 
 				compiler.hooks.done.tap(PLUGIN_NAME, () => {
 					console.info(`✅ ${PLUGIN_NAME}: Routes generated successfully`);
-
-					setTimeout(() => {
-						process.exit(0);
-					});
 				});
 			} else {
 				setupWatcher();

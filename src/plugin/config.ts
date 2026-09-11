@@ -1,4 +1,4 @@
-import { resolve, isAbsolute } from "node:path";
+import { isAbsolute, resolve } from "node:path";
 import type { TypeGenerateOptions } from "../router/route-type-generator";
 
 export interface PluginConfig {
@@ -58,6 +58,7 @@ export const getConfig = (
 		: resolve(root, config.generatedRoutesPath);
 
 	if (config.typeGenerateOptions) {
+		config.typeGenerateOptions = { ...config.typeGenerateOptions };
 		const { routesTypeFile } = config.typeGenerateOptions;
 		config.typeGenerateOptions.routesTypeFile = isAbsolute(routesTypeFile)
 			? routesTypeFile

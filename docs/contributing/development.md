@@ -6,8 +6,8 @@
 
 在开始开发之前，请确保你的开发环境满足以下要求：
 
-- **Node.js**: >= 16.0.0
-- **pnpm**: >= 8.0.0（本项目使用 pnpm 作为包管理器）
+- **Node.js**: 22 或 24 LTS 的最新安全补丁
+- **pnpm**: 10.34.5（本项目使用 pnpm 作为包管理器）
 - **Git**: 最新版本
 
 ## 安装依赖
@@ -22,7 +22,7 @@ cd fs-router
 2. 安装依赖：
 
 ```bash
-pnpm install
+pnpm install --frozen-lockfile
 ```
 
 ## 项目结构
@@ -111,11 +111,11 @@ pnpm test:watch
 - **TypeScript**: 类型检查
 - **Biome**: 代码格式化和 lint
 - **simple-git-hooks**: Git 钩子，推送前自动运行测试
-- **lint-staged**: 提交前检查暂存文件
+- **CI**: `pnpm check`、`pnpm typecheck`、`pnpm test`、`pnpm build`、`pnpm check:package`、`pnpm docs:build`、`pnpm docs:check`
 
 ### 提交前检查
 
-在提交代码前，会自动运行：
+安装 Git 钩子后，推送前会自动运行：
 
 ```bash
 pnpm test
@@ -145,7 +145,7 @@ pnpm dev
 ```bash
 # 在示例项目中测试
 cd examples/kn-admin
-pnpm install
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 
@@ -154,10 +154,8 @@ pnpm dev
 编辑 `src/plugin/webpack.ts`，然后：
 
 ```bash
-# 创建测试项目
-cd examples/webpack-example
-pnpm install
-pnpm dev
+# 在根目录运行真实 Webpack/Vite 构建边界测试
+pnpm exec vitest run tests/plugin.test.ts
 ```
 
 ## 调试技巧
@@ -174,7 +172,7 @@ console.log('Routes generated:', routes)
 
 ```bash
 # 类型检查
-npx tsc --noEmit
+pnpm typecheck
 ```
 
 ## 常见问题
@@ -184,8 +182,7 @@ npx tsc --noEmit
 尝试清理缓存并重新安装：
 
 ```bash
-rm -rf node_modules pnpm-lock.yaml
-pnpm install
+pnpm install --frozen-lockfile --force
 ```
 
 ### 构建失败

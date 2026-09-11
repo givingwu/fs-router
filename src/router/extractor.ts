@@ -1,12 +1,12 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { NESTED_ROUTE, JS_EXTENSIONS } from "./constants";
+import { JS_EXTENSIONS, NESTED_ROUTE } from "./constants";
 import type { RouteNode } from "./type";
 import {
 	getPathWithoutExt,
 	hasAction,
-	replaceWithAlias,
 	normalizeToPosixPath,
+	replaceWithAlias,
 } from "./utils";
 
 export interface AliasOptions {
@@ -34,7 +34,6 @@ const conventionNames: ConventionNameType[] = Object.values(NESTED_ROUTE);
  */
 export class RouteExtractor {
 	private readonly routesDir: string;
-	private readonly extensions = JS_EXTENSIONS;
 	private readonly entryName: string;
 	private readonly isMainEntry: boolean;
 	private readonly alias: AliasOptions;
@@ -284,14 +283,13 @@ export class RouteExtractor {
 		 *  - layout.tsx
 		 */
 		if (isPathlessLayout) {
-			// biome-ignore lint/performance/noDelete: <explanation>
 			delete finalRoute.path;
 		}
 
-		// biome-ignore lint/suspicious/noAssignInExpressions: <explanation>
-		const childRoutes = (finalRoute.children = finalRoute.children?.filter(
+		finalRoute.children = finalRoute.children?.filter(
 			(childRoute) => childRoute,
-		));
+		);
+		const childRoutes = finalRoute.children;
 
 		if (
 			childRoutes &&
@@ -352,10 +350,8 @@ export class RouteExtractor {
 
 				// the index is removed when the route path exists
 				if (routePath.length > 0) {
-					// biome-ignore lint/performance/noDelete: <explanation>
 					delete newRoute.index;
 				} else {
-					// biome-ignore lint/performance/noDelete: <explanation>
 					delete newRoute.path;
 				}
 
@@ -398,21 +394,6 @@ export class RouteExtractor {
 		return id.replace(/\[(.*?)\]/g, "($1)");
 	}
 
-	private isValidFile(filename: string): boolean {
-		const ext = path.extname(filename) as ".js" | ".jsx" | ".ts" | ".tsx";
-		return this.extensions.includes(ext);
-	}
-
-	private getRelativePath(filepath: string): string {
-		if (!this.alias) {
-			return path.relative(this.routesDir, filepath);
-		}
-
-		return getPathWithoutExt(
-			replaceWithAlias(this.alias.basename, filepath, this.alias.name),
-		);
-	}
-
 	private createRoute(
 		routeInfo: Partial<RouteNode>,
 		componentPath: string,
@@ -438,24 +419,5 @@ export class RouteExtractor {
 			},
 			componentPath,
 		);
-	}
-
-	private createSplatRoute(
-		splatFile: string,
-		splatLoader: string,
-		splatConfig: string,
-		splatClientData: string,
-		splatData: string,
-		splatAction: string,
-	): RouteNode {
-		return {
-			path: "*",
-			_component: splatFile,
-			loader: splatLoader,
-			config: splatConfig,
-			clientData: splatClientData,
-			data: splatData,
-			action: splatAction,
-		};
 	}
 }

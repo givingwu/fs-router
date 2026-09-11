@@ -1,6 +1,6 @@
 import { createWebpackPlugin } from "unplugin";
-import { unpluginRouterGeneratorFactory } from "./factory";
 import type { PluginConfig } from "./config";
+import { unpluginRouterGeneratorFactory } from "./factory";
 
 /**
  * @example
@@ -16,7 +16,7 @@ import type { PluginConfig } from "./config";
  * ```
  */
 const FileBasedRouterWebpack = /* #__PURE__ */ createWebpackPlugin(
-  unpluginRouterGeneratorFactory,
+	unpluginRouterGeneratorFactory,
 );
 
 export { FileBasedRouterWebpack, type PluginConfig };
