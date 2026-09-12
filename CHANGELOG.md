@@ -16,6 +16,8 @@
 - Named data actions and associated files are detected independently of directory enumeration order; layout loaders survive route flattening.
 - Escape file names in generated code, skip symlinks/hidden directories, retain errors and serialize generation requests.
 - Use host-owned watching; support new/deleted routes and avoid rewriting unchanged output.
+- Strip configured extensions such as `.mjs` and `.cjs` before parsing navigation route types.
+- Subscribe Webpack/Rspack host watchers before generation so fixing an initial or subsequent route error resumes compilation, including errors in separate type directories.
 
 ### Validation and release
 

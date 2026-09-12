@@ -91,6 +91,33 @@ describe("route generation boundaries", () => {
 		expect(code).not.toContain("disabled");
 		expect(types).not.toContain("/disabled");
 	});
+	it.each([".mjs", ".cjs"])(
+		"strips configured %s extensions from index, dynamic and splat route types",
+		async (extension) => {
+			const { root, write } = await fixture();
+			await write(`page${extension}`);
+			await write(`(public)/users/[id]/page${extension}`);
+			await write(`files/$${extension}`);
+			const config = getConfig(
+				{
+					routeExtensions: [".tsx", extension],
+					typeGenerateOptions: {
+						routesTypeFile: "src/routes-type.ts",
+						routesDirectories: [{ path: "src/routes", prefix: "/app" }],
+					},
+				},
+				root,
+			);
+			const code = await generator(config);
+			const types = await readFile(join(root, "src/routes-type.ts"), "utf8");
+			expect(code).toContain("index: true");
+			expect(code).toContain('path: "/users/:id"');
+			expect(code).toContain('path: "files/*"');
+			expect(
+				Array.from(types.matchAll(/"([^"]+)": \{\}/g), ([, path]) => path),
+			).toEqual(["/app", "/app/files/*", "/app/users/:id"]);
+		},
+	);
 	it("rejects overlapping outputs, including a symlinked parent", async () => {
 		const { root } = await fixture();
 		expect(() =>

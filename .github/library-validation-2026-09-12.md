@@ -15,11 +15,11 @@
 
 | 环境或检查 | 结果 |
 | --- | --- |
-| Node 24.20.0 / npm 12.0.2 / pnpm 10.34.5 | frozen install、Biome、类型检查、36 项单元/回归测试通过 |
-| Node 22.12.0 / npm 11.19.0 / pnpm 10.34.5 | 类型检查、36 项测试及同一最终 tarball 的消费者验证通过；较早一轮也实际执行了此 Node 下的完整声明/库构建 |
+| Node 24.20.0 / npm 12.0.2 / pnpm 10.34.5 | frozen install、Biome、类型检查、47 项单元/回归测试通过 |
+| Node 22.12.0 / npm 11.19.0 / pnpm 10.34.5 | 类型检查、47 项测试及同一最终 tarball 的消费者验证通过；较早一轮也实际执行了此 Node 下的完整声明/库构建 |
 | React 18.3.1 与 19.2.8，各在上述两条 Node 线上 | tarball 安装；四入口 ESM/CJS；strict / skipLibCheck=false 的 Bundler 与 NodeNext ESM/CJS；未知路由/遗漏参数的负向类型测试 |
 | Vite 6.4.3、Webpack 5.110.3、Rspack 1.7.12 | 每组消费者都实际构建 eager/lazy 两种模式，验证 split chunks；执行生成路由的 matchRoutes、loader、named action 和导航 hook |
-| 热更新 | Vite 新增、修改数据模块导出、删除路由；Webpack/Rspack 新增/删除后实际模块图和编译恢复均验证 |
+| 热更新 | Vite 新增、修改数据模块导出、删除路由；Webpack/Rspack 新增/删除后实际模块图更新；首次及后续生成失败后的恢复见下方补充 |
 | 文档 | 36 HTML，326 静态资源引用，维持 `/fs-router/` |
 | 重建一致性 | 同一 Node 24.20.0 / npm 12.0.2 环境重新构建和打包，SHA-512 与最终消费者验证包完全相同 |
 | npm publish --dry-run --ignore-scripts | 对最终 tarball 通过；没有上传包、没有验证服务端 OIDC |
@@ -42,10 +42,18 @@ Node 22.12 使用 require(ESM) 时可能产生实验性提示，实际加载与�
 ## 包预览
 
 - 版本：0.1.0（Unreleased）。
-- tarball：`feoe-fs-router-0.1.0.tgz`，55181 bytes；解包 294430 bytes。
+- tarball：`feoe-fs-router-0.1.0.tgz`，55513 bytes；解包 282070 bytes。本预览包含下述审查修复，替代此前的 55181-byte 候选包。
 - 共 19 个文件：四入口各 JS/CJS/DTS/DCTS，另有 package.json、README、MIT LICENSE；没有测试、示例、工作区文件或 source map。
-- integrity：`sha512-8zMKosSvOSPgyzKT6hPjNVFvUyvh+QNyCkbnufo7d/MDxcOl+SLgvOz6uj+OpGMO/wo0EMh5+XVF3aIVJiI5dQ==`。
+- integrity：`sha512-ZBg7tcbhcvC+jTtQdeyNhDugnRIo5JKh6/gy/jvwhgLLTz3Xfsinr3c+RfWhsVYEDGjm3A+OSWt5/9jFNrnjTQ==`。
 - 精确清单由 `.artifacts/package-preview.json` 输出，预览工作流将其与 tarball 一起保存。
+
+## 审查修复补充
+
+- 类型生成先去除已识别的配置扩展名，再调用路径解析器。`.mjs` / `.cjs` 两项回归覆盖带前缀的根索引、分组动态路由和 `$` 通配路由；旧代码实际产生 `/app/page/mjs` 等错误声明，修复后与运行时路径一致。
+- Webpack/Rspack 共用监听注册逻辑，在每次 `watchRun` 等待生成前订阅宿主 watcher，并保存上一编译的文件、目录及缺失依赖。错误仍传给宿主；监听与关闭由宿主负责。
+- `tests/watch-recovery.test.ts` 的 9 项真实 watcher 测试覆盖 Webpack、Rspack 默认 watcher 和 Rspack 原生 watcher，分别从缺少根布局、重复页面和缺少独立类型目录启动。仅修正路由即可恢复；随后再制造重复页面，确认普通入口仍被监听，再仅删除重复页面恢复。原实现的 Webpack/Rspack 首次布局和重复页面用例均因没有第二次编译而失败。
+- 原生 watcher 使用 `realpath` 后的 fixture 根目录验证；macOS 临时目录经符号链接访问时的原生 watcher 恢复未通过，不将该组合纳入支持承诺。
+- 修复后的 47 项测试及类型检查在 Node 22.12.0 / 24.20.0 均通过；两条 Node 上的 React 18/19 消费者重新验证同一更新后的 tarball。
 
 ## 支持边界与后续事项
 

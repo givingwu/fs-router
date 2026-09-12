@@ -47,12 +47,10 @@ export async function generateRouteType(
 				);
 			} else if (entry.isFile()) {
 				const ext = extname(entry.name);
-				if (
-					!extensions.includes(ext) ||
-					!["page", "$"].includes(entry.name.slice(0, -ext.length))
-				)
+				const stem = entry.name.slice(0, -ext.length);
+				if (!extensions.includes(ext) || !["page", "$"].includes(stem))
 					continue;
-				const parsed = pathParser([...segments, entry.name].join("/")).route;
+				const parsed = pathParser([...segments, stem].join("/")).route;
 				paths.add(
 					`/${prefix}/${parsed}`.replace(/\/+/g, "/").replace(/\/$/, "") || "/",
 				);
