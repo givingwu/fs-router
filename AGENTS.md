@@ -190,3 +190,7 @@ export default function createPlugin() {}
 
 - 修改文档后运行 `pnpm docs:dev` 预览
 - 发布前运行 `pnpm docs:build` 构建
+
+### 公开内容范围
+
+遵守 `CONTRIBUTING.md` 中的公开内容范围：不将雇主、客户或合作方的名称、品牌、内部系统地址、工作区文档链接或真实业务数据写入项目内容或生成产物。使用本项目文档、公开上游资料和虚构示例，保留必要的第三方许可证与来源声明。
