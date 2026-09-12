@@ -22,7 +22,7 @@ Baseline: main `0971ed7` (library compatibility stage). Local environment: macOS
 | `pnpm docs:smoke` | 3 browser tests passed: dev/preview search and keyboard, navigation, mobile menus, images, no page exceptions |
 | axe WCAG A/AA tags | No automated violations on home, quick start and English entry, in both light and dark (six scans) |
 | `pnpm example:setup && pnpm example:check` | Real tarball installation; all three production builds and strict generated navigation type checks passed |
-| `pnpm example:smoke` | 4 browser tests passed: typed navigation, fictional loader, lazy chunk requests, deep-link refresh, loader error, catch-all, Vite component update and route add/delete |
+| `pnpm example:smoke` | 4 browser tests passed: typed navigation, fictional loader, visible fallback while lazy chunks are held, deep-link refresh, loader error, catch-all, Vite component update and route add/delete |
 | Independent clean source snapshot | No node_modules or generated example routes copied; frozen root install, setup, all builds and 4 browser tests passed |
 | `npm audit` in minimal example | 0 advisories, including development dependencies |
 | Root `pnpm audit` | 2 existing moderate documentation-development advisories remain; no high/critical advisories |
@@ -43,6 +43,13 @@ npx --yes pnpm@10.34.5 docs:smoke
 ```
 
 For interactive use run `npm --prefix examples/minimal-react run dev`; stop with Ctrl-C. Browser tests own and close their local servers. Linux CI installs Chromium with `--with-deps`. Screenshots and the accessibility report are written to `.artifacts/browser` and uploaded by the read-only CI job for seven days.
+
+## CI and review corrections
+
+- Webpack/Rspack watch generation failures now become compilation errors, with emission vetoed until generation succeeds. The host compiler retains and resumes its own complete dependency graph; the plugin no longer manually restarts the host watcher with copied dependency collections. All nine watch-recovery scenarios additionally check that edits are not emitted during an error and appear after recovery.
+- The search shortcut hint has explicit readable text color and no opacity transition during hydration. The browser accessibility test exercises the `Ctrl` text branch even on macOS, covering the Linux CI finding in addition to the native Mac search tests.
+- The example's chunk fallback now belongs to the lazy `users/layout.tsx`, rather than the eagerly imported root layout. Each of the three browser scenarios holds JavaScript chunk requests until “Loading component…” is visible, then releases them and verifies the loaded page.
+- Follow-up validation: all 47 unit tests passed on macOS arm64 and Linux arm64 with Node 24.20.0; React 18/19 packaged consumers passed on macOS; all three example builds and all seven browser tests passed. Linux unit tests used a fresh Linux dependency tree in a disposable container. Browser evidence remains Chromium/macOS locally; GitHub CI supplies the Ubuntu/Node 22/24 results.
 
 ## Discovery metadata
 

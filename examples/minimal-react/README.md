@@ -2,6 +2,8 @@
 
 A client-only app with fictional data, a required root layout, typed navigation, a dynamic loader, loading/error UI and a catch-all page. No backend, credentials or hosted account.
 
+`users/loading.tsx` is the chunk fallback for the lazy `users/layout.tsx`. The root layout is imported eagerly, so placing a chunk fallback beside it would have no effect. Root pending UI separately reports client loader navigation.
+
 The library is an **unpublished candidate**. From the repository root:
 
 ```sh

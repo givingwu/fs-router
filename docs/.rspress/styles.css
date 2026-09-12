@@ -24,6 +24,11 @@
 .rspress-nav-search-button button {
 	color: var(--rp-c-text-2);
 }
+.rspress-nav-search-button button > div {
+	color: var(--rp-c-text-2);
+	/* Keep the Ctrl/Command hint readable as hydration reveals it. */
+	transition: none;
+}
 .rspress-doc a.header-anchor:focus-visible {
 	opacity: 1;
 }

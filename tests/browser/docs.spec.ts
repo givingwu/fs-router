@@ -60,6 +60,10 @@ for (const [mode, port] of [
 test("production pages: images, responsive navigation and accessibility", async ({
 	page,
 }) => {
+	// Exercise the text shortcut label even when the test host is macOS.
+	await page.addInitScript(() => {
+		Object.defineProperty(navigator, "platform", { get: () => "Linux x86_64" });
+	});
 	await page.goto("http://127.0.0.1:4176/fs-router/");
 	await expect(page.getByRole("link", { name: "运行最小示例" })).toBeVisible();
 	for (const img of await page.locator("img:visible").all()) {

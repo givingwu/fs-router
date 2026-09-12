@@ -20,7 +20,22 @@ for (const [tool, port] of [
 		await page.getByRole("button", { name: "Count: 0" }).click();
 		await expect(page.getByRole("button", { name: "Count: 1" })).toBeVisible();
 		const before = requests.length;
-		await page.getByRole("button", { name: "Open user 42" }).click();
+		let releaseChunks = () => {};
+		const chunksBlocked = new Promise<void>((resolve) => {
+			releaseChunks = resolve;
+		});
+		await page.route(/\.js(?:\?|$)/, async (route) => {
+			await chunksBlocked;
+			await route.continue();
+		});
+		try {
+			await page.getByRole("button", { name: "Open user 42" }).click();
+			await expect(
+				page.getByText("Loading component…", { exact: true }),
+			).toBeVisible();
+		} finally {
+			releaseChunks();
+		}
 		await expect(
 			page.getByRole("heading", { name: "Demo User" }),
 		).toBeVisible();

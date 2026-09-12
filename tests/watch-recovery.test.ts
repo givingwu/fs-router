@@ -135,6 +135,10 @@ describe.each(["webpack", "rspack", "rspack native"] as const)(
 						{ timeout: 5000 },
 					);
 					const subsequentFailures = builds;
+					// Failed generation must not emit the edited application bundle.
+					expect(
+						await readFile(join(root, "output/main.js"), "utf8"),
+					).not.toContain("value = 43");
 					await rm(duplicate);
 					await vi.waitFor(
 						() => {
@@ -143,6 +147,9 @@ describe.each(["webpack", "rspack", "rspack native"] as const)(
 						},
 						{ timeout: 5000 },
 					);
+					expect(
+						await readFile(join(root, "output/main.js"), "utf8"),
+					).toContain("value = 43");
 				} finally {
 					if (watcher)
 						await new Promise<void>((resolve) =>
