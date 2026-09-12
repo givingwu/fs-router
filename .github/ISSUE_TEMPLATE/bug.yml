@@ -1,0 +1,44 @@
+name: Bug report / 问题报告
+description: Report a reproducible routing, build, type or documentation problem.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        中文和 English 均可。先搜索已有问题；最小复现可用虚构数据，不需要商业源码。
+        漏洞请先阅读 [SECURITY.md](https://github.com/givingwu/fs-router/blob/main/SECURITY.md)，不要公开利用细节、凭据或私人信息。
+        参与讨论请遵守 [Code of Conduct](https://github.com/givingwu/fs-router/blob/main/CODE_OF_CONDUCT.md)。
+  - type: input
+    id: version
+    attributes:
+      label: Package version or commit / 包版本或提交
+      description: Include npm version, or the commit used to build a local tarball. For docs, include the page URL.
+      placeholder: "0.0.13 from npm, or 0.1.0 local tarball at commit …"
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment / 环境
+      description: OS, Node, package manager, React + React DOM, React Router DOM, TypeScript and bundler versions; N/A for documentation-only reports.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Minimal reproduction and steps / 最小复现与步骤
+      description: Paste a small route tree, plugin options, relevant source and exact commands, or a public minimal reproduction URL. Remove private paths and business data.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior / 预期与实际行为
+      description: Explain what should happen, what happened, and whether it occurs during build, watch, navigation or type checking.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs / 已脱敏日志（可选）
+      render: text

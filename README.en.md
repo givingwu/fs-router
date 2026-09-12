@@ -21,4 +21,6 @@ Tested baselines: React/React DOM 18.3.1 or 19.2.8, Router DOM 7.18.3, Vite 6.4.
 
 Navigation types apply to this library's hook. Non-root components are lazy-loaded by default; loaders remain client-side static imports. Route structure edits can reload the page. SSR, RSC, Router 6, server-only loaders and performance leadership are not supported claims.
 
-[Contribute](./CONTRIBUTING.md) · [Security](./SECURITY.md) · [MIT license](./LICENSE)
+[Contribute (Chinese / English)](./CONTRIBUTING.md) · [Starter tasks (Chinese)](./docs/contributing/first-contribution.md) · [Roadmap (Chinese)](./ROADMAP.md) · [Support](./SUPPORT.md) · [Code of Conduct](./CODE_OF_CONDUCT.md) · [Security](./SECURITY.md) · [MIT license](./LICENSE)
+
+Bilingual [issue forms](https://github.com/givingwu/fs-router/issues/new/choose) accept bugs and feature requests. Use a blank issue for trial feedback, including unsuccessful attempts; no private application code is needed. See the [selection guide (Chinese)](./docs/guide/choosing.md) before adopting.

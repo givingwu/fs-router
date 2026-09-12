@@ -68,4 +68,10 @@ SSR, RSC, server-only loaders, Router 6, automatic loader-result types and frame
 
 [Chinese quick start](./guide/start/getting-started.md) · [API](./api/index.md) · [0.1 migration](./guide/migration/v0.1.md) · [Troubleshooting](./guide/faq/troubleshooting.md) · [Report an issue](https://github.com/givingwu/fs-router/issues)
 
+## Contributing and feedback
+
+Chinese and English contributions are welcome. Read the [bilingual contribution guide](https://github.com/givingwu/fs-router/blob/main/CONTRIBUTING.md) for the fork-to-PR workflow and checks, and the [Code of Conduct](https://github.com/givingwu/fs-router/blob/main/CODE_OF_CONDUCT.md) for participation and reporting channels. [Starter tasks](./contributing/first-contribution.md) and the [selection guide](./guide/choosing.md) are currently in Chinese.
+
+Use the [bug/feature forms](https://github.com/givingwu/fs-router/issues/new/choose), or a blank issue for questions and trial feedback. Include the version/commit, environment, completed steps, first obstacle and reason to continue or stop. Private application code is not required. [Support](https://github.com/givingwu/fs-router/blob/main/SUPPORT.md) is best effort with no response deadline. Report vulnerabilities through [SECURITY.md](https://github.com/givingwu/fs-router/blob/main/SECURITY.md), not a public reproduction.
+
 </div>

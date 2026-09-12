@@ -1,0 +1,137 @@
+{
+  "collected_at_utc": "2026-09-12T04:28:29.223069+00:00",
+  "source_commit": "ced7ac9fab94196c02d3752f7f7b2a539a23e0f1",
+  "repository": {
+    "source": "https://api.github.com/repos/givingwu/fs-router",
+    "data": {
+      "description": "Implementation is a routing system based on Modern.js file-system routes style",
+      "homepage": "https://givingwu.github.io/fs-router/",
+      "topics": [],
+      "stargazers_count": 1,
+      "forks_count": 0,
+      "has_issues": true,
+      "has_discussions": false
+    }
+  },
+  "community_profile": {
+    "source": "https://api.github.com/repos/givingwu/fs-router/community/profile",
+    "health_percentage": 71,
+    "missing_files": [
+      "code_of_conduct_file",
+      "issue_template",
+      "pull_request_template"
+    ]
+  },
+  "private_vulnerability_reporting": {
+    "source": "https://api.github.com/repos/givingwu/fs-router/private-vulnerability-reporting",
+    "enabled": false
+  },
+  "npm_dist_tags": {
+    "command": "npm view @feoe/fs-router dist-tags --json",
+    "data": {
+      "latest": "0.0.13"
+    }
+  },
+  "npm_downloads": [
+    {
+      "source": "https://api.npmjs.org/downloads/point/2026-08-15:2026-09-11/@feoe%2Ffs-router",
+      "data": {
+        "downloads": 23,
+        "start": "2026-08-15",
+        "end": "2026-09-11",
+        "package": "@feoe/fs-router"
+      }
+    },
+    {
+      "source": "https://api.npmjs.org/downloads/point/2026-07-18:2026-08-14/@feoe%2Ffs-router",
+      "data": {
+        "downloads": 44,
+        "start": "2026-07-18",
+        "end": "2026-08-14",
+        "package": "@feoe/fs-router"
+      }
+    }
+  ],
+  "issues": {
+    "source": "https://api.github.com/repos/givingwu/fs-router/issues?state=all&per_page=100",
+    "ordinary_issue_count": 0,
+    "pagination": "Single page, fewer than 100 results; pull requests excluded."
+  },
+  "pull_requests": {
+    "source": "https://api.github.com/repos/givingwu/fs-router/pulls?state=all&per_page=100",
+    "pagination": "Single page, fewer than 100 results.",
+    "data": [
+      {
+        "number": 8,
+        "url": "https://github.com/givingwu/fs-router/pull/8",
+        "state": "open",
+        "merged_at": null,
+        "author": "dependabot[bot]",
+        "author_type": "Bot"
+      },
+      {
+        "number": 7,
+        "url": "https://github.com/givingwu/fs-router/pull/7",
+        "state": "open",
+        "merged_at": null,
+        "author": "dependabot[bot]",
+        "author_type": "Bot"
+      },
+      {
+        "number": 6,
+        "url": "https://github.com/givingwu/fs-router/pull/6",
+        "state": "open",
+        "merged_at": null,
+        "author": "dependabot[bot]",
+        "author_type": "Bot"
+      },
+      {
+        "number": 5,
+        "url": "https://github.com/givingwu/fs-router/pull/5",
+        "state": "closed",
+        "merged_at": "2026-09-12T04:12:49Z",
+        "author": "givingwu",
+        "author_type": "User"
+      },
+      {
+        "number": 4,
+        "url": "https://github.com/givingwu/fs-router/pull/4",
+        "state": "closed",
+        "merged_at": "2026-09-12T03:08:37Z",
+        "author": "givingwu",
+        "author_type": "User"
+      },
+      {
+        "number": 3,
+        "url": "https://github.com/givingwu/fs-router/pull/3",
+        "state": "closed",
+        "merged_at": "2026-09-12T02:20:34Z",
+        "author": "givingwu",
+        "author_type": "User"
+      },
+      {
+        "number": 2,
+        "url": "https://github.com/givingwu/fs-router/pull/2",
+        "state": "closed",
+        "merged_at": "2026-09-11T16:01:15Z",
+        "author": "givingwu",
+        "author_type": "User"
+      },
+      {
+        "number": 1,
+        "url": "https://github.com/givingwu/fs-router/pull/1",
+        "state": "closed",
+        "merged_at": "2026-09-11T15:01:40Z",
+        "author": "givingwu",
+        "author_type": "User"
+      }
+    ]
+  },
+  "measurement_limits": [
+    "Downloads are not unique users and do not include local tarball installs.",
+    "No recorded external trial reports; actual adoption is unknown.",
+    "Owner and bot PRs are not counted as external human contributions.",
+    "Repository traffic and Pages analytics were not collected; N/A is not zero.",
+    "Community health is not a certification; no badge was requested."
+  ]
+}
