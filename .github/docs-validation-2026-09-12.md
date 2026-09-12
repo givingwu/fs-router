@@ -1,5 +1,7 @@
 # Documentation and onboarding validation — 2026-09-12
 
+This is the historical documentation-stage record. Subsequent dependency PRs broke the example installation; see the [follow-up dependency validation](./example-dependency-validation-2026-09-12.md) for the regression, restored versions and fresh checks. Results below do not certify later main commits.
+
 Baseline: main `0971ed7` (library compatibility stage). Local environment: macOS arm64, Node 24.20.0, pnpm 10.34.5, Chromium 153.0.8010.12 (Playwright 1.63.0), axe-core 4.13.0. npm registry reported `@feoe/fs-router` latest as **0.0.13** during this review; 0.1.0 remains an unpublished candidate.
 
 ## Delivered behavior

@@ -62,6 +62,8 @@ With generated declarations, this hook checks paths and required parameters. Rea
 
 React/React DOM 18.3.1 and 19.2.8; Router DOM 7.18.3; Vite 6.4.3; Webpack 5.110.3; Rspack 1.7.12; TypeScript 5.9.3. See the [full support matrix (Chinese)](./guide/compatibility.md) for exact evidence and untested environments.
 
+The runnable example pins React/React DOM 18.3.1, types 18.3.31/18.3.7 and Vite 6.4.3 with React plugin 4.7.0. React 19.2.8 is verified separately by the packaged consumer suite. Update each related set together and check the library's peer ranges before changing majors.
+
 Default splitting lazy-loads non-root components; root layout and loaders remain static imports. Loaders/actions run in the client module graph. `loading.tsx` handles component loading, not all data pending states. Structural edits may reload the page; React Fast Refresh belongs to the application's React plugin.
 
 SSR, RSC, server-only loaders, Router 6, automatic loader-result types and framework deployment are not supported claims. There are no published performance comparisons. Older feature-heavy examples are historical references outside the current matrix.
