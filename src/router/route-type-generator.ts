@@ -1,65 +1,82 @@
-import fs from "node:fs";
-import { glob } from "glob";
+import { lstat, readdir } from "node:fs/promises";
+import { extname, join } from "node:path";
 import { pathParser } from "../core/path-parser";
+import { validateOutputs, writeGenerated } from "../plugin/output";
+import { JS_EXTENSIONS } from "./constants";
+import { quote } from "./utils";
 
 export interface RouteDirectory {
-	/** 路由前缀 */
 	prefix?: string;
-	/** 路由目录路径 */
 	path: string;
 }
-
 export interface TypeGenerateOptions {
-	/** 类型文件输出路径 */
 	routesTypeFile: string;
-	/** 是否生成路由参数类型 */
+	/** Reserved for compatibility; parameters are inferred by useNavigation. */
 	generateRouteParams?: boolean;
-	/** 是否生成 Loader 类型 */
+	/** Reserved for compatibility; loader result types are not generated. */
 	generateLoaderTypes?: boolean;
-	/** 路由目录配置 */
 	routesDirectories?: Array<RouteDirectory>;
 }
-
-// 保持向后兼容
 export type GenerateRouteTypeOptions = TypeGenerateOptions;
 
-const GlobPattern = "**/page.{jsx,tsx}";
-export async function generateRouteType(options: TypeGenerateOptions) {
+export async function generateRouteType(
+	options: TypeGenerateOptions,
+	extensions: readonly string[] = JS_EXTENSIONS,
+) {
 	const { routesTypeFile, routesDirectories = [] } = options;
-
-	const allFiles: string[] = [];
-
-	for (const route of routesDirectories) {
-		const relatedFiles = await glob(GlobPattern, {
-			cwd: route.path,
-		});
-
-		allFiles.push(
-			...relatedFiles.map((file) =>
-				route.prefix ? `${route.prefix}/${file}` : file,
-			),
-		);
+	await validateOutputs(
+		[routesTypeFile],
+		routesDirectories.map((directory) => directory.path),
+	);
+	const paths = new Set<string>();
+	async function walk(directory: string, segments: string[], prefix: string) {
+		for (const entry of (
+			await readdir(directory, { withFileTypes: true })
+		).sort((a, b) => a.name.localeCompare(b.name, "en"))) {
+			if (
+				entry.isSymbolicLink() ||
+				entry.name.startsWith(".") ||
+				entry.name === "node_modules"
+			)
+				continue;
+			if (entry.isDirectory()) {
+				await walk(
+					join(directory, entry.name),
+					[...segments, entry.name],
+					prefix,
+				);
+			} else if (entry.isFile()) {
+				const ext = extname(entry.name);
+				if (
+					!extensions.includes(ext) ||
+					!["page", "$"].includes(entry.name.slice(0, -ext.length))
+				)
+					continue;
+				const parsed = pathParser([...segments, entry.name].join("/")).route;
+				paths.add(
+					`/${prefix}/${parsed}`.replace(/\/+/g, "/").replace(/\/$/, "") || "/",
+				);
+			}
+		}
 	}
-
-	const routeTypes = allFiles.map((path) => {
-		const { route, params } = pathParser(path);
-
-		return {
-			route: route.startsWith("/") ? route : `/${route}`,
-			params,
-		};
-	});
-
-	const routeTypesContent = [
+	for (const directory of routesDirectories) {
+		const stat = await lstat(directory.path);
+		if (!stat.isDirectory() || stat.isSymbolicLink())
+			throw new Error(
+				`Routes directory must be a real directory: ${directory.path}`,
+			);
+		await walk(directory.path, [], directory.prefix ?? "");
+	}
+	const content = [
+		`import "@feoe/fs-router";`,
 		`declare module "@feoe/fs-router" {`,
-		"			interface RouteTypes {",
-		...routeTypes.map((routeType) => {
-			return `        "${routeType.route}": {};`;
-		}),
-		"			}",
-		"		};",
-		"export {};",
+		"  interface RouteTypes {",
+		...Array.from(paths)
+			.sort()
+			.map((route) => `    ${quote(route)}: {};`),
+		"  }",
+		"}",
+		"",
 	].join("\n");
-
-	fs.writeFileSync(routesTypeFile, routeTypesContent);
+	await writeGenerated(routesTypeFile, content);
 }

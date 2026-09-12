@@ -2,10 +2,10 @@ export const users = [
 	{
 		id: 7237365,
 		name: "John Doe",
-		email: "john@doe.com",
+		email: "john@example.com",
 		phone: "1234567890",
 		avatar: "https://avatars.githubusercontent.com/u/7237365?s=264&v=4",
-		website: "https://john.doe",
+		website: "https://example.com/users/john",
 	},
 	{
 		id: 13431452,
@@ -18,9 +18,9 @@ export const users = [
 	{
 		id: 12605189,
 		name: "Jim Doe",
-		email: "jim@doe.com",
+		email: "jim@example.com",
 		phone: "1234567890",
 		avatar: "https://avatars.githubusercontent.com/u/12605189?s=264&v=4",
-		website: "https://jim.doe",
+		website: "https://example.com/users/jim",
 	},
 ];

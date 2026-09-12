@@ -1,4 +1,4 @@
-import { isAbsolute, resolve } from "node:path";
+import { isAbsolute, relative, resolve, sep } from "node:path";
 import type { TypeGenerateOptions } from "../router/route-type-generator";
 
 export interface PluginConfig {
@@ -28,10 +28,7 @@ export const defaultConfig: PluginConfig = {
 	generatedRoutesPath: "src/routes.tsx",
 	routeExtensions: [".js", ".jsx", ".ts", ".tsx"],
 	splitting: true,
-	alias: {
-		name: "@",
-		basename: "src",
-	},
+	alias: undefined,
 	enableGeneration: true,
 	defaultErrorBoundary: false,
 	typeGenerateOptions: {
@@ -63,7 +60,46 @@ export const getConfig = (
 		config.typeGenerateOptions.routesTypeFile = isAbsolute(routesTypeFile)
 			? routesTypeFile
 			: resolve(root, routesTypeFile);
+		if (!config.typeGenerateOptions.routesDirectories?.length) {
+			config.typeGenerateOptions.routesDirectories = [
+				{ path: config.routesDirectory },
+			];
+		}
 	}
 
+	if (config.alias)
+		config.alias = {
+			...config.alias,
+			basename: resolve(root, config.alias.basename),
+		};
+	if (config.typeGenerateOptions?.routesDirectories) {
+		config.typeGenerateOptions.routesDirectories =
+			config.typeGenerateOptions.routesDirectories.map((directory) => ({
+				...directory,
+				path: resolve(root, directory.path),
+			}));
+	}
+	const outputs = [
+		config.generatedRoutesPath,
+		config.typeGenerateOptions?.routesTypeFile,
+	].filter((p): p is string => Boolean(p));
+	if (new Set(outputs).size !== outputs.length)
+		throw new Error("Route code and type outputs must be different files");
+	for (const directory of [
+		config.routesDirectory,
+		...(config.typeGenerateOptions?.routesDirectories?.map((d) => d.path) ??
+			[]),
+	]) {
+		for (const output of outputs) {
+			const rel = relative(directory, output);
+			if (
+				rel === "" ||
+				(!isAbsolute(rel) && rel !== ".." && !rel.startsWith(`..${sep}`))
+			)
+				throw new Error(
+					"Generated output must be outside all routes directories",
+				);
+		}
+	}
 	return config;
 };

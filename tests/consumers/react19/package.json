@@ -1,0 +1,20 @@
+{
+  "name": "fs-router-consumer",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-router-dom": "7.18.3",
+    "@loadable/component": "5.16.7",
+    "@types/loadable__component": "5.13.10",
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0",
+    "@types/node": "22.20.2",
+    "vite": "6.4.3",
+    "webpack": "5.110.3",
+    "@rspack/core": "1.7.12",
+    "typescript": "5.9.3",
+    "unplugin": "2.3.11"
+  }
+}

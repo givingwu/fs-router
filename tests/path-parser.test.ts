@@ -86,3 +86,8 @@ for (const pathCase of PathExamples) {
 		expect(result).toEqual(pathCase.expect);
 	});
 }
+
+it("parses flattened dynamic directories without splitting splat names", () => {
+	expect(pathParser("users.[id]/page.tsx").route).toBe("users/:id");
+	expect(pathParser("files/[...path]/page.tsx").route).toBe("files/*");
+});

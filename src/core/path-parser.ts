@@ -10,10 +10,25 @@ export type PathParserResult = {
 
 export function pathParser(path: string): PathParserResult {
 	// 移除开头和结尾的斜杠
-	const normalizedPath = path.replace(/^\/+|\/+$/g, "");
+	const normalizedPath = path.replace(/\\/g, "/").replace(/^\/+|\/+$/g, "");
 	// 移除文件后缀名
 	const pathWithoutExt = normalizedPath.replace(/\.[jt]sx?$/, "");
-	const pathSegments = pathWithoutExt.split("/");
+	const pathSegments = pathWithoutExt.split("/").flatMap((segment) => {
+		if (segment.startsWith("(") || segment.startsWith("__")) return [segment];
+		const pieces: string[] = [];
+		let depth = 0;
+		let start = 0;
+		for (let index = 0; index < segment.length; index++) {
+			if (segment[index] === "[") depth++;
+			if (segment[index] === "]") depth--;
+			if (segment[index] === "." && depth === 0) {
+				pieces.push(segment.slice(start, index));
+				start = index + 1;
+			}
+		}
+		pieces.push(segment.slice(start));
+		return pieces;
+	});
 	const params: RouterParam[] = [];
 
 	// 过滤掉 (group) 分组和 __开头的目录，并处理每个路径段

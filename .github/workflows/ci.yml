@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ['22', '24']
+        node: ['22.12.0', '24.20.0']
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -36,7 +36,6 @@ jobs:
       - run: pnpm check
       - run: pnpm typecheck
       - run: pnpm test
-      - run: pnpm build
-      - run: pnpm check:package
+      - run: pnpm check:consumers
       - run: pnpm docs:build
       - run: pnpm docs:check

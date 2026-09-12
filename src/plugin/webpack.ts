@@ -1,4 +1,5 @@
 import { createWebpackPlugin } from "unplugin";
+import type { WebpackPluginInstance } from "webpack";
 import type { PluginConfig } from "./config";
 import { unpluginRouterGeneratorFactory } from "./factory";
 
@@ -15,7 +16,9 @@ import { unpluginRouterGeneratorFactory } from "./factory";
  * })
  * ```
  */
-const FileBasedRouterWebpack = /* #__PURE__ */ createWebpackPlugin(
+const FileBasedRouterWebpack: (
+	options?: Partial<PluginConfig>,
+) => WebpackPluginInstance = /* #__PURE__ */ createWebpackPlugin(
 	unpluginRouterGeneratorFactory,
 );
 

@@ -7,12 +7,17 @@ const pkg = JSON.parse(
 	readFileSync(new URL("../package.json", import.meta.url), "utf8"),
 );
 for (const [entry, targets] of Object.entries(pkg.exports)) {
-	for (const [condition, path] of Object.entries(targets)) {
-		assert(
-			existsSync(new URL(`../${path}`, import.meta.url)),
-			`${entry}: missing ${condition} target ${path}`,
-		);
-	}
+	const verifyTargets = (targets) => {
+		for (const target of Object.values(targets)) {
+			if (typeof target === "string")
+				assert(
+					existsSync(new URL(`../${target}`, import.meta.url)),
+					`${entry}: missing ${target}`,
+				);
+			else verifyTargets(target);
+		}
+	};
+	verifyTargets(targets);
 	const name = pkg.name + (entry === "." ? "" : entry.slice(1));
 	const esm = await import(name);
 	const cjs = require(name);

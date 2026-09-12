@@ -24,12 +24,10 @@ type RouteParams<Path extends string> = {
 		| boolean;
 };
 
-type PathParameters<Path extends string> = Exclude<
-	PathParam<Path>,
-	OptionalParams<Path>
->["length"] extends 0
-	? [path: Path, params?: RouteParams<Path>, query?: Record<string, string>]
-	: [path: Path, params: RouteParams<Path>, query?: Record<string, string>];
+type PathParameters<Path extends string> =
+	Exclude<PathParam<Path>, OptionalParams<Path>> extends never
+		? [path: Path, params?: RouteParams<Path>, query?: Record<string, string>]
+		: [path: Path, params: RouteParams<Path>, query?: Record<string, string>];
 
 export function useNavigation() {
 	const navigate = useNavigate();
@@ -39,12 +37,13 @@ export function useNavigation() {
 			...args: PathParameters<Path>
 		) => {
 			const [path, params, query] = args;
-			let href = generatePath(
-				path,
-				params as unknown as {
-					[key in PathParam<Path>]: string | null;
-				},
+			const values = Object.fromEntries(
+				Object.entries(params ?? {}).map(([key, value]) => [
+					key,
+					value == null ? null : String(value),
+				]),
 			);
+			let href = generatePath(path as string, values);
 
 			if (query) {
 				if (href.includes("?")) {

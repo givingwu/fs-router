@@ -1,5 +1,6 @@
 import * as path from "node:path";
 import type { RouteNode } from "./type";
+import { quote } from "./utils";
 
 interface RouteCodeGeneratorOptions {
 	splitting?: boolean;
@@ -11,9 +12,7 @@ export class RouteCodeGenerator {
 	 * runtime imports
 	 * 使用 loadable 替换 lazy
 	 */
-	private runtimeImports: Set<string> = new Set([
-		`import loadable from '@loadable/component';`,
-	]);
+	private runtimeImports: Set<string> = new Set();
 	/** loader imports */
 	private loaderImports: Set<string> = new Set();
 	/** loading imports */
@@ -33,13 +32,25 @@ export class RouteCodeGenerator {
 	}
 
 	generate(routes: RouteNode[]): string {
+		for (const imports of [
+			this.runtimeImports,
+			this.loaderImports,
+			this.loadingImports,
+			this.errorImports,
+			this.configImports,
+			this.componentDeclarations,
+		])
+			imports.clear();
 		const routeCode = this.generateRouteCode(routes);
 
 		return this.wrapWithImports(routeCode);
 	}
 
 	private generateRouteCode(routes: RouteNode[]): string {
-		const code = `export const routes = [
+		this.runtimeImports.add(
+			`import type { RouteObject } from 'react-router-dom';`,
+		);
+		const code = `export const routes: RouteObject[] = [
   ${routes.map((route) => this.stringifyRoute(route)).join(",\n  ")}
 ];`;
 
@@ -54,6 +65,7 @@ export class RouteCodeGenerator {
 
 		// These values are source-code fragments, not runtime RouteObjects.
 		const routeObj = {
+			id: route.id,
 			path: route.path,
 			index: route.index,
 			errorElement: errorElement || undefined,
@@ -72,7 +84,8 @@ export class RouteCodeGenerator {
 		const routeEntries = Object.entries(routeObj)
 			.filter(([_, value]) => value !== undefined)
 			.map(([key, value]) => {
-				if (key === "path") return `${key}: '${value}'`;
+				if (key === "path" || key === "id")
+					return `${key}: ${quote(String(value))}`;
 				if (key === "element") return `${key}: ${value}`;
 				if (key === "errorElement") return `${key}: ${value}`;
 				return `${key}: ${value}`;
@@ -93,11 +106,14 @@ export class RouteCodeGenerator {
 			path.basename(route._component, path.extname(route._component));
 
 		if (route.isRoot) {
-			this.runtimeImports.add(`import RootLayout from '${route._component}';`);
+			this.runtimeImports.add(
+				`import RootLayout from ${quote(route._component)};`,
+			);
 			return "<RootLayout />";
 		}
 
 		if (this.options.splitting) {
+			this.runtimeImports.add(`import loadable from '@loadable/component';`);
 			const importPath = route._component;
 			const componentName = `Component_${this.componentDeclarations.size}`;
 
@@ -107,14 +123,14 @@ export class RouteCodeGenerator {
 				const loadingName = `Loading_${this.loadingImports.size}`;
 
 				this.loadingImports.add(
-					`import ${loadingName} from '${route.loading}';`,
+					`import ${loadingName} from ${quote(route.loading)};`,
 				);
 				loadingComponent = `, { fallback: <${loadingName} /> }`;
 			}
 
 			// Define component using loadable for code splitting
 			this.componentDeclarations.add(
-				`const ${componentName} = loadable(() => import(/* webpackChunkName: "${chunkName}" */ '${importPath}')${loadingComponent});`,
+				`const ${componentName} = loadable(() => import(/* webpackChunkName: "${chunkName.replace(/[^a-zA-Z0-9_()/.-]/g, "_")}" */ ${quote(importPath)})${loadingComponent});`,
 			);
 
 			return `<${componentName} />`;
@@ -122,7 +138,7 @@ export class RouteCodeGenerator {
 
 		const componentName = `Component_${this.componentDeclarations.size}`;
 		this.componentDeclarations.add(
-			`import ${componentName} from '${route._component}';`,
+			`import ${componentName} from ${quote(route._component)};`,
 		);
 
 		return `<${componentName} />`;
@@ -132,7 +148,7 @@ export class RouteCodeGenerator {
 		if (!route.error) return "";
 
 		const errorName = `Error_${this.errorImports.size}`;
-		this.errorImports.add(`import ${errorName} from '${route.error}';`);
+		this.errorImports.add(`import ${errorName} from ${quote(route.error)};`);
 
 		return `<${errorName} />`;
 	}
@@ -142,7 +158,9 @@ export class RouteCodeGenerator {
 		if (!route.action) return "";
 
 		const actionName = `action_${this.loaderImports.size}`;
-		this.loaderImports.add(`import ${actionName} from '${route.action}';`);
+		this.loaderImports.add(
+			`import { action as ${actionName} } from ${quote(route.action)};`,
+		);
 
 		return actionName;
 	}
@@ -154,7 +172,7 @@ export class RouteCodeGenerator {
 		if (route.data) {
 			const loaderName = `loader_${this.loaderImports.size}`;
 			this.loaderImports.add(
-				`import { loader as ${loaderName}${route.action ? `, action as ${loaderName}_action` : ""} } from '${route.data}';`,
+				`import { loader as ${loaderName} } from ${quote(route.data)};`,
 			);
 			loaders.push(loaderName);
 		}
@@ -163,7 +181,7 @@ export class RouteCodeGenerator {
 		if (route.clientData) {
 			const clientDataName = `clientData_${this.loaderImports.size}`;
 			this.loaderImports.add(
-				`import { loader as ${clientDataName} } from '${route.clientData}';`,
+				`import { loader as ${clientDataName} } from ${quote(route.clientData)};`,
 			);
 			loaders.push(clientDataName);
 		}
@@ -171,7 +189,9 @@ export class RouteCodeGenerator {
 		// Handle regular loader
 		if (route.loader) {
 			const loaderName = `loader_${this.loaderImports.size}`;
-			this.loaderImports.add(`import ${loaderName} from '${route.loader}';`);
+			this.loaderImports.add(
+				`import ${loaderName} from ${quote(route.loader)};`,
+			);
 			loaders.push(loaderName);
 		}
 
@@ -179,9 +199,9 @@ export class RouteCodeGenerator {
 
 		// Combine multiple loaders if needed
 		if (loaders.length > 1) {
-			return `async (...args) => {
-        const [${loaders.join(", ")}] = await Promise.all([${loaders.map((l) => `${l}(...args)`).join(", ")}]);
-        return { ...${loaders.join(", ...")} };
+			return `async (...args: Parameters<import('react-router-dom').LoaderFunction>) => {
+			const values = await Promise.all([${loaders.map((l) => `(${l} as import('react-router-dom').LoaderFunction)(...args)`).join(", ")}]);
+        return values.find(value => value instanceof Response) ?? Object.assign({}, ...values);
       }`;
 		}
 
