@@ -14,7 +14,7 @@
 | Webpack | 5.110.3：构建、开关 splitting、watch 增删文件重新生成 |
 | Rspack | 1.7.12：同上；没有把 Rspack 2 的要求套用到 1.x |
 | TypeScript | 5.9.3，strict / skipLibCheck=false；公共入口覆盖 Bundler 与 NodeNext ESM/CJS；生成 TSX 使用 Bundler 模式 |
-| 未覆盖 | Router 6、Router 8、Vite 7/8、Rspack 2、TypeScript 6、SSR/RSC、各平台浏览器 E2E |
+| 未覆盖 | Router 6、Router 8、Vite 7/8、Rspack 2、TypeScript 6、SSR/RSC、Firefox/WebKit 及其他平台浏览器 E2E |
 
 peer 版本范围允许同主版本的后续兼容更新，但测试证据仅覆盖表中的确切版本；不意味着每个组合都已逐一运行。构建器是 optional peer，按需安装；React、React DOM、Router DOM 和 Loadable 是应用负责的 peer。TypeScript 用于构建插件分析导出，属于库依赖。库根入口不引入文件扫描器或 Node 内建模块。
 
@@ -51,7 +51,7 @@ pnpm check:consumers
 
 `check:consumers` 生成 `.artifacts/package-preview.json` 并实际安装 tarball。两套消费者有独立 npm 锁文件：验证四个入口加载、严格声明解析、生成路由的匹配/loader/action/导航，以及三种构建器与结构监听。`FS_ROUTER_CONSUMER=react18` 或 `react19` 可选一组；`FS_ROUTER_TARBALL=/absolute/path/package.tgz` 可验证既有包字节。完整测试见 `tests/consumers/verify.mjs`。
 
-旧 `examples/` 的依赖锁文件和 UI 不属于本次矩阵。第一阶段发现的独立管理后台示例安全告警仍需后续处理，不能用根包的结果替代。文档其他历史章节将在文档阶段统一校准，发生冲突以本页、迁移页和实际 API 为准。
+`examples/minimal-react` 已加入三种构建器、严格类型和 Chromium 页面检查。旧大型示例的独立依赖与 UI 不属于矩阵，根包结果不能替代其安全验证。文档与最小示例的命令见[快速开始](./start/getting-started.md)。
 
 ## 核验来源
 

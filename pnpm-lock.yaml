@@ -7,6 +7,11 @@ settings:
 overrides:
   refractor@3>prismjs: 1.30.0
 
+patchedDependencies:
+  '@rspress/theme-default@1.47.2':
+    hash: fa1a7ea87ce52bb55e59a8b7115c29c911610a9fbb54a56cf08622c50ace4a00
+    path: patches/@rspress__theme-default@1.47.2.patch
+
 importers:
 
   .:
@@ -18,6 +23,9 @@ importers:
         specifier: ^2.3.11
         version: 2.3.11
     devDependencies:
+      '@axe-core/playwright':
+        specifier: 4.13.0
+        version: 4.13.0(playwright-core@1.63.0)
       '@biomejs/biome':
         specifier: 2.5.13
         version: 2.5.13
@@ -27,6 +35,9 @@ importers:
       '@microsoft/api-extractor':
         specifier: 7.59.1
         version: 7.59.1(@types/node@22.20.2)
+      '@playwright/test':
+        specifier: 1.63.0
+        version: 1.63.0
       '@rslib/core':
         specifier: ^0.4.1
         version: 0.4.1(@microsoft/api-extractor@7.59.1(@types/node@22.20.2))(typescript@5.9.3)
@@ -35,7 +46,7 @@ importers:
         version: 1.7.12(@swc/helpers@0.5.23)
       '@rspress/theme-default':
         specifier: ^1.47.2
-        version: 1.47.2
+        version: 1.47.2(patch_hash=fa1a7ea87ce52bb55e59a8b7115c29c911610a9fbb54a56cf08622c50ace4a00)
       '@types/loadable__component':
         specifier: 5.13.10
         version: 5.13.10
@@ -71,6 +82,11 @@ importers:
         version: 5.110.3
 
 packages:
+
+  '@axe-core/playwright@4.13.0':
+    resolution: {integrity: sha512-6YLx+kxXu5GJceG4ozFg+33a2EMTdjYwWGloJ3sb9Kta5pp+ZNS53uxGVog5JetIY8s++P5UrtX+cri+u0VAVg==}
+    peerDependencies:
+      playwright-core: '>= 1.0.0'
 
   '@babel/runtime@7.29.7':
     resolution: {integrity: sha512-Nq8OhGWiZIZGV6hLHoyAKLLcJihP/xFeBMGJoUrxTX2psI8dCifzLhZISFb+VWS3wFMRDmCGw5R+dOySCqPLhw==}
@@ -616,6 +632,11 @@ packages:
   '@parcel/watcher@2.6.0':
     resolution: {integrity: sha512-7FNeNl8NCE7aINx7WXiKQrPYZWC/hvrTsmk6zmxbI7LTXE7hVek/n8AfVgpe2y82zl3w0HvCHN0bVKMBoJcC0w==}
     engines: {node: '>= 10.0.0'}
+
+  '@playwright/test@1.63.0':
+    resolution: {integrity: sha512-oxMK4vllB9RK5NQ2l1pq1IfOf2AvnEuj/vYGDj0H2nMtmtZpKtCwt/l00GEO6xjGfpBNAvjovvYdCm50dRQkpQ==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   '@remix-run/router@1.23.4':
     resolution: {integrity: sha512-q7j5geK7xs3UJSdm9/iytUNclBnLmYx1EnSeCFXHPeutdqgIMeFeHtUZgS3EhlKxdBEAu8OwtJCwmLrEzpSs7Q==}
@@ -1324,6 +1345,10 @@ packages:
   astring@1.9.0:
     resolution: {integrity: sha512-LElXdjswlqjWrPpJFg1Fx4wpkOCxj1TDHlSV4PlaRxHGWko024xICaa97ZkMfs6DRKlCguiAI+rbXv5GWwXIkg==}
     hasBin: true
+
+  axe-core@4.13.0:
+    resolution: {integrity: sha512-UzGt8zg7Ny8djbYMhxl2zuEevVa7r2gJjYY5Lwr1xM7+XU2nd6CkIWFTVcCIbAP63vSz71NaVyyuSk9lHKcy0A==}
+    engines: {node: '>=4'}
 
   bail@2.0.2:
     resolution: {integrity: sha512-0xO6mYd7JB2YesxDKplafRpsiOzPt9V02ddPCLbY1xYGPOX24NTyN50qnUxgCPcSoYMhKpAuBTjQoRZCAkUDRw==}
@@ -2167,6 +2192,16 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
+  playwright-core@1.63.0:
+    resolution: {integrity: sha512-rYCsBF/M5HjUch52bbtVONEFjv6Xu8sm8h72dNlR5bzIE1fvC/bxgspzkjSfU+MweEMmPM8KJebG6nnyxo5mCg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.63.0:
+    resolution: {integrity: sha512-+7ziBLidS4NaNCdt57SUDT+wYmmd5fmiQejUic/kb+YsYSCPyOOE9sebzMjNmQrsnNpDJqd4WHvV/8lfKfUDUg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   postcss@8.5.28:
     resolution: {integrity: sha512-RRuzqDtt5Y9h3quz5hWhK+TPnsmVs6WwSU6LkJMeY4HstUEDuYTG8UJSdawMRzmzAtV+KEoG8N3Qg2qLy5vM/A==}
     engines: {node: ^10 || ^12 || >=14}
@@ -2801,6 +2836,11 @@ packages:
 
 snapshots:
 
+  '@axe-core/playwright@4.13.0(playwright-core@1.63.0)':
+    dependencies:
+      axe-core: 4.13.0
+      playwright-core: 1.63.0
+
   '@babel/runtime@7.29.7': {}
 
   '@biomejs/biome@2.5.13':
@@ -3302,6 +3342,10 @@ snapshots:
       '@parcel/watcher-win32-x64': 2.6.0
     optional: true
 
+  '@playwright/test@1.63.0':
+    dependencies:
+      playwright: 1.63.0
+
   '@remix-run/router@1.23.4': {}
 
   '@rollup/rollup-android-arm-eabi@4.63.1':
@@ -3606,7 +3650,7 @@ snapshots:
       '@rspress/plugin-medium-zoom': 1.47.2(@rspress/runtime@1.47.2)
       '@rspress/runtime': 1.47.2
       '@rspress/shared': 1.47.2
-      '@rspress/theme-default': 1.47.2
+      '@rspress/theme-default': 1.47.2(patch_hash=fa1a7ea87ce52bb55e59a8b7115c29c911610a9fbb54a56cf08622c50ace4a00)
       enhanced-resolve: 5.18.0
       github-slugger: 2.0.0
       hast-util-from-html: 2.0.3
@@ -3702,7 +3746,7 @@ snapshots:
       lodash-es: 4.18.1
       unified: 10.1.2
 
-  '@rspress/theme-default@1.47.2':
+  '@rspress/theme-default@1.47.2(patch_hash=fa1a7ea87ce52bb55e59a8b7115c29c911610a9fbb54a56cf08622c50ace4a00)':
     dependencies:
       '@mdx-js/react': 2.3.0(react@18.3.1)
       '@rspress/runtime': 1.47.2
@@ -4002,6 +4046,8 @@ snapshots:
   assertion-error@2.0.1: {}
 
   astring@1.9.0: {}
+
+  axe-core@4.13.0: {}
 
   bail@2.0.2: {}
 
@@ -5066,6 +5112,12 @@ snapshots:
   picomatch@2.3.2: {}
 
   picomatch@4.0.7: {}
+
+  playwright-core@1.63.0: {}
+
+  playwright@1.63.0:
+    dependencies:
+      playwright-core: 1.63.0
 
   postcss@8.5.28:
     dependencies:

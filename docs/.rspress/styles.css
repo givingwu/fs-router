@@ -1,0 +1,38 @@
+/* Contrast corrections for the pinned Rspress 1 default theme. */
+:root:not(.dark) {
+	--rp-c-text-2: #505b66;
+	--rp-c-text-3: #59636f;
+	--rp-c-gray: #56616c;
+	--rp-c-brand: #0061ad;
+	--rp-c-brand-dark: #00599f;
+	--rp-c-link: #00599f;
+	--code-token-string: #217438;
+	--code-token-comment: #59636f;
+	--code-token-constant: #935500;
+	--code-token-symbol: #935500;
+	--code-token-parameter: #145f9e;
+	--code-token-variable: #145f9e;
+}
+.dark {
+	--rp-c-text-2: #c5cbd3;
+	--rp-c-text-3: #b9c1cd;
+	--rp-c-gray: #c5cbd3;
+	--rp-c-brand: #81baff;
+	--rp-c-link: #81baff;
+	--code-token-comment: #aeb8c4;
+}
+.rspress-nav-search-button button {
+	color: var(--rp-c-text-2);
+}
+.rspress-nav-search-button button > div {
+	color: var(--rp-c-text-2);
+	/* Keep the Ctrl/Command hint readable as hydration reveals it. */
+	transition: none;
+}
+.rspress-doc a.header-anchor:focus-visible {
+	opacity: 1;
+}
+:where(a, button, input, pre):focus-visible {
+	outline: 2px solid var(--rp-c-brand);
+	outline-offset: 3px;
+}

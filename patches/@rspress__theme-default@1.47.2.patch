@@ -1,0 +1,37 @@
+diff --git a/dist/bundle.js b/dist/bundle.js
+index 57c926c7d16d7191f8e2a968778fcb59b6995218..e4b8fa564d45b00911479bda38989e2f1d9f4e6a 100644
+--- a/dist/bundle.js
++++ b/dist/bundle.js
+@@ -4503,7 +4503,7 @@ function SearchPanel({ focused, setFocused }) {
+                     }
+                     break;
+                 case KEY_CODE.ARROW_DOWN:
+-                    if (e.isComposing) return;
++                    if (e.isComposing || !currentSuggestions?.length) return;
+                     if (focused) {
+                         e.preventDefault();
+                         if (currentSuggestions && currentRenderType === types_RenderType.Default) {
+@@ -4513,7 +4513,7 @@ function SearchPanel({ focused, setFocused }) {
+                     }
+                     break;
+                 case KEY_CODE.ARROW_UP:
+-                    if (e.isComposing) return;
++                    if (e.isComposing || !currentSuggestions?.length) return;
+                     if (focused) {
+                         e.preventDefault();
+                         if (currentRenderType === types_RenderType.Default) {
+@@ -4524,12 +4524,13 @@ function SearchPanel({ focused, setFocused }) {
+                     }
+                     break;
+                 case KEY_CODE.ENTER:
+-                    if (e.isComposing) return;
++                    if (e.isComposing || !focused) return;
+                     if (currentSuggestionIndex >= 0 && currentRenderType === types_RenderType.Default) {
+                         const flatSuggestions = [
+                             ...Object.values(normalizeSuggestions(currentSuggestions))
+                         ].flat();
+                         const suggestion = flatSuggestions[currentSuggestionIndex];
++                        if (!suggestion) return;
+                         const isCurrent = 0 === resultTabIndex;
+                         if (isCurrent) window.location.href = (0, __WEBPACK_EXTERNAL_MODULE__rspress_shared_baa012d0__.isProduction)() ? suggestion.link : removeDomain(suggestion.link);
+                         else window.open(suggestion.link);

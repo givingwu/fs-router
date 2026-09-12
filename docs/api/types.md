@@ -1,67 +1,22 @@
 # 类型定义
 
-@feoe/fs-router 的 TypeScript 类型定义。
+| 入口 | 公开类型 |
+| --- | --- |
+| `@feoe/fs-router` | `PathParserResult`、`RouterParam`、`RouteTypes` |
+| `@feoe/fs-router/vite` | `PluginConfig` |
+| `@feoe/fs-router/webpack` | `PluginConfig` |
+| `@feoe/fs-router/rspack` | `PluginConfig` |
 
-## 核心类型
+`RouteTypes` 是可声明合并的接口，由生成的类型文件扩充。它记录路径键，不生成 loader 结果或参数业务 schema。
 
-```typescript
-export interface RouteConfig {
-  path: string
-  element: React.ComponentType
-  children?: RouteConfig[]
-  loader?: LoaderFunction
-  action?: ActionFunction
-}
-
-export interface LoaderFunction {
-  (args: LoaderFunctionArgs): Promise<any> | any
-}
-
-export interface ActionFunction {
-  (args: ActionFunctionArgs): Promise<any> | any
-}
+```ts
+import type { PluginConfig } from '@feoe/fs-router/vite';
+type TypeOptions = NonNullable<PluginConfig['typeGenerateOptions']>;
+const typeOptions: TypeOptions = { routesTypeFile: 'src/routes-type.ts' };
 ```
 
-## 插件选项类型
+内部的 `TypeGenerateOptions`、`RouteDirectory`、`NavigationOptions` 不是单独公开的具名导出。通过公开 `PluginConfig` 的属性取得配置类型，避免导入 `dist/...`。
 
-```typescript
-export interface PluginConfig {
-  /** 路由文件目录 */
-  routesDirectory: string
-  /** 生成的路由文件路径 */
-  generatedRoutesPath: string
-  /** 路由文件扩展名 */
-  routeExtensions?: string[]
-  /** 是否启用路由生成 */
-  enableGeneration?: boolean
-  /** 路径别名配置 */
-  alias?: {
-    name: string
-    basename: string
-  }
-  /** 是否启用代码分割 */
-  splitting?: boolean
-  /** 是否启用默认错误边界 */
-  defaultErrorBoundary?: boolean
-  /** 类型生成选项 */
-  typeGenerateOptions?: TypeGenerateOptions
-}
+`RouteObject`、`LoaderFunctionArgs`、`ActionFunctionArgs` 从 `react-router-dom` 导入。本库没有旧文档所列的公开 `RouteConfig`、`LoaderFunction`、`ActionFunction` 接口。
 
-export interface TypeGenerateOptions {
-  /** 类型文件输出路径 */
-  routesTypeFile: string
-  /** 是否生成路由参数类型 */
-  generateRouteParams?: boolean
-  /** 是否生成 Loader 类型 */
-  generateLoaderTypes?: boolean
-  /** 路由目录配置 */
-  routesDirectories?: RouteDirectory[]
-}
-
-export interface RouteDirectory {
-  /** 路由前缀 */
-  prefix?: string
-  /** 路由目录路径 */
-  path: string
-}
-```
+有效配置与兼容保留字段见[插件选项](../guide/configuration/plugin-options.md)。

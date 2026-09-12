@@ -4,6 +4,8 @@
 		"src",
 		"tests/**/*.test.ts",
 		"*.config.ts",
-		"docs/.rspress/**/*.ts"
+		"docs/.rspress/**/*.ts",
+		"docs/.rspress/**/*.tsx",
+		"tests/browser/**/*.ts"
 	]
 }

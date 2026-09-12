@@ -8,15 +8,6 @@ type Compiler =
 	| Parameters<NonNullable<UnpluginOptions["webpack"]>>[0]
 	| Parameters<NonNullable<UnpluginOptions["rspack"]>>[0];
 
-function watchDependencies(values: Iterable<string>) {
-	const dependencies = new Set(values);
-	// Rspack's native watcher also requires incremental dependency collections.
-	return Object.assign(dependencies, {
-		added: dependencies,
-		removed: new Set<string>(),
-	});
-}
-
 /** Plugin structure inspired by https://github.com/TanStack/router/tree/main/packages/router-plugin */
 export const unpluginRouterGeneratorFactory: UnpluginFactory<
 	Partial<PluginConfig> | undefined
@@ -52,10 +43,9 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 	};
 	const configureCompiler = (compiler: Compiler) => {
 		setRoot(compiler.context);
-		let files = watchDependencies([]);
-		let directories = watchDependencies(routeDirectories());
-		let missing = watchDependencies([]);
+		let generationError: Error | undefined;
 		const beforeBuild = async () => {
+			generationError = undefined;
 			await generate();
 			if (config.enableGeneration) {
 				// The host snapshot precedes watchRun; invalidate generated modules
@@ -70,21 +60,27 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 		};
 		compiler.hooks.beforeRun.tapPromise(PLUGIN_NAME, beforeBuild);
 		compiler.hooks.watchRun.tapPromise(PLUGIN_NAME, async () => {
-			// A rejected generation skips afterCompile. Subscribe before awaiting
-			// it on every run so route edits can recover initial and later failures.
-			// Watching owns cleanup and retains the last compilation's dependencies.
-			if (config.enableGeneration)
-				compiler.watching?.watch(files, directories, missing);
-			await beforeBuild();
+			try {
+				await beforeBuild();
+			} catch (error) {
+				// Complete an errored compilation so the host can retain its full
+				// dependency graph and resume its own watcher after every failure.
+				generationError =
+					error instanceof Error ? error : new Error(String(error));
+			}
 		});
+		compiler.hooks.thisCompilation.tap(PLUGIN_NAME, (compilation) => {
+			if (generationError) compilation.errors.push(generationError);
+		});
+		compiler.hooks.shouldEmit.tap(
+			PLUGIN_NAME,
+			// Rspack's type omits undefined, which lets later bail-hook taps run.
+			(() => (generationError ? false : undefined)) as () => boolean,
+		);
 		compiler.hooks.afterCompile.tap(PLUGIN_NAME, (compilation) => {
 			if (!config.enableGeneration) return;
 			for (const directory of routeDirectories())
 				compilation.contextDependencies.add(directory);
-			// Copy Rspack's native-backed collections while this compilation is live.
-			files = watchDependencies(compilation.fileDependencies);
-			directories = watchDependencies(compilation.contextDependencies);
-			missing = watchDependencies(compilation.missingDependencies);
 		});
 	};
 

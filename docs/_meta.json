@@ -18,5 +18,13 @@
     "text": "贡献",
     "link": "/contributing/",
     "activeMatch": "^/contributing/"
+  },
+  {
+    "text": "English",
+    "link": "/english"
+  },
+  {
+    "text": "GitHub",
+    "link": "https://github.com/givingwu/fs-router"
   }
 ]

@@ -1,98 +1,36 @@
 # Rspack 集成示例
 
-本指南展示如何在 Rspack 项目中集成 @feoe/fs-router。
+按[快速开始](../guide/start/getting-started.md) 安装最小示例；其 Rspack 固定为 1.7.12。
 
-## 安装依赖
+```js
+// rspack.config.mjs：核心配置
+import { resolve } from 'node:path';
+import fileBasedRouter from '@feoe/fs-router/rspack';
+import { rspack } from '@rspack/core';
 
-```bash
-npm install @feoe/fs-router -D
-```
-
-## Rspack 配置
-
-```javascript
-// rspack.config.js
-const { FileBasedRouterRspack as fileBasedRouter } = require('@feoe/fs-router/rspack')
-
-module.exports = {
+export default {
+  mode: 'production',
   entry: './src/main.tsx',
-  plugins: [
-    fileBasedRouter({
-      routesDirectory: 'src/routes',
-      generatedRoutesPath: 'src/routes.tsx',
-      // 启用类型生成
-      enableGeneration: true,
-      typeGenerateOptions: {
-        routesTypeFile: "src/routes-type.ts",
-        // 微前端应用配置
-        routesDirectories: [
-          {
-            path: path.join(__dirname, "../shell/src/routes"),
-          },
-          {
-            prefix: "admin",
-            path: path.join(__dirname, "src/routes"),
-          },
-        ],
-      },
-    })
-  ],
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'builtin:swc-loader',
-        options: {
-          jsc: {
-            parser: {
-              syntax: 'typescript',
-              tsx: true,
-            },
-          },
-        },
-      },
-    ],
-  },
-}
+  output: { path: resolve('dist/rspack'), filename: 'app.js', publicPath: '/', clean: true },
+  resolve: { extensions: ['.tsx', '.ts', '.js'] },
+  module: { rules: [{
+    test: /\.tsx?$/, exclude: /node_modules/,
+    use: { loader: 'builtin:swc-loader', options: { jsc: {
+      parser: { syntax: 'typescript', tsx: true },
+      transform: { react: { runtime: 'automatic' } },
+    } } },
+  }] },
+  plugins: [fileBasedRouter(), new rspack.HtmlRspackPlugin({ template: './bundler.html' })],
+};
 ```
 
-## 微前端配置
+实际配置还以配置文件所在目录固定 context/output，避免 cwd 变化。不要把 SWC 的 options 放在规则对象外层。
 
-```javascript
-// 主应用配置
-const { FileBasedRouterRspack as fileBasedRouter } = require('@feoe/fs-router/rspack')
-
-module.exports = {
-  plugins: [
-    fileBasedRouter({
-      routesDirectory: 'src/routes',
-      generatedRoutesPath: 'src/routes.tsx',
-      enableGeneration: true,
-      typeGenerateOptions: {
-        routesTypeFile: "src/routes-type.ts",
-        routesDirectories: [
-          // 主应用路由
-          {
-            path: path.join(__dirname, "src/routes"),
-          },
-          // 子应用路由
-          {
-            prefix: "admin",
-            path: path.join(__dirname, "../admin/src/routes"),
-          },
-          {
-            prefix: "user",
-            path: path.join(__dirname, "../user/src/routes"),
-          },
-        ],
-      },
-    })
-  ]
-}
+```sh
+npm --prefix examples/minimal-react run build:rspack
+npm --prefix examples/minimal-react run preview:rspack
 ```
 
-## 完整示例
+构建脚本调用 Rspack API，检查错误并关闭 compiler，再运行 tsc；不需要全局 CLI。preview 仅提供本地生产产物与 SPA 回退，不是线上部署服务。文件结构和 loader 用法与 Vite 相同。
 
-查看完整的 Rspack 集成示例：
-- [基础示例](https://github.com/givingwu/fs-router/tree/master/examples/kn-admin)
-- [微前端示例](https://github.com/givingwu/fs-router/tree/master/examples/rsbuild-react-monorepo)
+[完整配置](https://github.com/givingwu/fs-router/blob/main/examples/minimal-react/rspack.config.mjs)。旧 Rsbuild 微前端工程不作为此版本兼容性证据；额外 runtime 集成需单独验证。

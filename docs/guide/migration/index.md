@@ -1,12 +1,8 @@
 # 迁移指南
 
-如果你正在从其他路由解决方案迁移到 @feoe/fs-router，这里提供了详细的迁移指南。
+先在分支中运行最小示例，记录原应用行为，再逐个路由迁移。
 
-## 迁移指南
+- [迁移到 0.1](./v0.1.md)：peer、类型、扫描、loader 和监听变化。
+- [从手写 React Router 路由迁移](./from-react-router.md)：保留应用 Router 与业务逻辑。
 
-- [从 React Router 迁移](./from-react-router.md) - 从传统 React Router 迁移
-
-## 版本升级
-
-- 查看 [更新日志](https://github.com/givingwu/fs-router/releases) 了解版本变更
-- 遵循 [语义化版本](https://semver.org/) 规范
+版本范围见[兼容性](../compatibility.md)。候选版本尚未发布，不应把本指南等同于旧 npm 版本说明。

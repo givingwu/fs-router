@@ -1,63 +1,33 @@
 # Webpack 集成示例
 
-本指南展示如何在 Webpack 项目中集成 @feoe/fs-router。
+按[快速开始](../guide/start/getting-started.md) 安装最小示例；Webpack 固定为 5.110.3。
 
-## 安装依赖
+```js
+// webpack.config.mjs：核心配置
+import { resolve } from 'node:path';
+import fileBasedRouter from '@feoe/fs-router/webpack';
+import HtmlWebpackPlugin from 'html-webpack-plugin';
 
-```bash
-npm install @feoe/fs-router -D
+export default {
+  mode: 'production',
+  entry: './src/main.tsx',
+  output: { path: resolve('dist/webpack'), filename: 'app.js', publicPath: '/', clean: true },
+  resolve: { extensions: ['.tsx', '.ts', '.js'] },
+  module: { rules: [{
+    test: /\.tsx?$/, exclude: /node_modules/,
+    use: { loader: 'ts-loader', options: { transpileOnly: true, compilerOptions: { noEmit: false, allowImportingTsExtensions: false } } },
+  }] },
+  plugins: [fileBasedRouter(), new HtmlWebpackPlugin({ template: './bundler.html' })],
+};
 ```
 
-## Webpack 配置
+实际配置固定 context/output 路径。`transpileOnly` 仅负责转译，独立 `tsc --noEmit` 必须在生成后运行；不能把成功打包视为类型检查通过。
 
-```javascript
-// webpack.config.js
-const { FileBasedRouterWebpack as fileBasedRouter } = require('@feoe/fs-router/webpack')
-
-module.exports = {
-  entry: './src/index.tsx',
-  plugins: [
-    fileBasedRouter({
-      routesDirectory: 'src/routes',
-      generatedRoutesPath: 'src/routes.tsx',
-      enableGeneration: true,
-      typeGenerateOptions: {
-        routesTypeFile: 'src/routes-type.ts'
-      }
-    })
-  ],
-  module: {
-    rules: [
-      {
-        test: /\.tsx?$/,
-        use: 'ts-loader',
-        exclude: /node_modules/,
-      },
-    ],
-  },
-  resolve: {
-    extensions: ['.tsx', '.ts', '.js'],
-  },
-}
+```sh
+npm --prefix examples/minimal-react run build:webpack
+npm --prefix examples/minimal-react run preview:webpack
 ```
 
-## 开发配置
+脚本通过 Webpack API 构建、检查错误并关闭 compiler，不依赖全局 CLI。生产服务器还需要正确的 SPA 深链接回退。
 
-```javascript
-// webpack.dev.js
-const { merge } = require('webpack-merge')
-const common = require('./webpack.config.js')
-
-module.exports = merge(common, {
-  mode: 'development',
-  devtool: 'inline-source-map',
-  devServer: {
-    static: './dist',
-    historyApiFallback: true,
-  },
-})
-```
-
-## 完整示例
-
-查看完整的 Webpack 集成示例：[GitHub 示例](https://github.com/givingwu/fs-router/tree/master/examples)
+[完整配置](https://github.com/givingwu/fs-router/blob/main/examples/minimal-react/webpack.config.mjs)。CommonJS 用户改用 `.cjs` 与 `require('@feoe/fs-router/webpack').default`，不要混用 ESM 文件与 require。
