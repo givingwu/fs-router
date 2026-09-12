@@ -78,7 +78,7 @@
 		"dev": "rslib build --watch",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"prepare": "simple-git-hooks",
+		"prepare": "node scripts/install-hooks.mjs",
 		"prepublishOnly": "pnpm check && pnpm typecheck && pnpm test && pnpm check:consumers",
 		"docs:dev": "rspress dev --config docs/.rspress/config.ts",
 		"docs:build": "rspress build --config docs/.rspress/config.ts && node scripts/build-docs-sitemap.mjs",

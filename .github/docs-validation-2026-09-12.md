@@ -46,6 +46,7 @@ For interactive use run `npm --prefix examples/minimal-react run dev`; stop with
 
 ## CI and review corrections
 
+- Git hook installation is skipped quietly during packing and CI. npm 10.9.0 was reproduced running `prepare` despite `pack --ignore-scripts`; hook logs polluted the JSON consumed by package validation. A real npm 10.9.0 tarball now returns valid JSON and passes the React 18/19 consumer checks.
 - Webpack/Rspack watch generation failures now become compilation errors, with emission vetoed until generation succeeds. The host compiler retains and resumes its own complete dependency graph; the plugin no longer manually restarts the host watcher with copied dependency collections. All nine watch-recovery scenarios additionally check that edits are not emitted during an error and appear after recovery.
 - The search shortcut hint has explicit readable text color and no opacity transition during hydration. The browser accessibility test exercises the `Ctrl` text branch even on macOS, covering the Linux CI finding in addition to the native Mac search tests.
 - The example's chunk fallback now belongs to the lazy `users/layout.tsx`, rather than the eagerly imported root layout. Each of the three browser scenarios holds JavaScript chunk requests until “Loading component…” is visible, then releases them and verifies the loaded page.
