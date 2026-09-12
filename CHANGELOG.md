@@ -24,6 +24,11 @@
 - Tarball consumer fixtures cover React 18/19, Vite/Webpack/Rspack, strict TypeScript and route execution.
 - Add manual package preview and gated npm OIDC workflow, migration/support notes and rollback instructions. No npm version has been published by this change.
 
+### Community
+
+- Add bilingual bug/feature forms, a PR template, conduct reporting, support and maintenance policies, and scoped starter tasks.
+- Document selection tradeoffs, a reproducible demo, draft release/community introductions and a 30/60/90-day adoption plan with dated public metrics. Repository metadata changes and outreach remain proposals.
+
 ## 0.0.13
 
 Existing release before this changelog. Historical behavior can be reviewed in Git history; release details are not reconstructed here.

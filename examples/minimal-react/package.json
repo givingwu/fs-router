@@ -27,7 +27,7 @@
     "@types/loadable__component": "5.13.10",
     "@types/node": "22.20.2",
     "typescript": "5.9.3",
-    "vite": "6.4.3",
+    "vite": "8.2.2",
     "@vitejs/plugin-react": "4.7.0",
     "webpack": "5.110.3",
     "@rspack/core": "1.7.12",

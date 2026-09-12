@@ -124,6 +124,8 @@ pnpm docs:build && pnpm docs:check
 
 消费者检查实际安装 tarball，在独立目录验证 ESM/CJS、类型、三种构建器、路由匹配、loader/action、导航和增删文件监听。最小示例另有 Chromium 页面验证；其他历史 `examples/` 工程未纳入兼容承诺。
 
-[贡献指南](./CONTRIBUTING.md) · [安全政策](./SECURITY.md) · [MIT](./LICENSE)
+[贡献指南](./CONTRIBUTING.md) · [入门任务](./docs/contributing/first-contribution.md) · [路线图](./ROADMAP.md) · [支持](./SUPPORT.md) · [行为准则](./CODE_OF_CONDUCT.md) · [安全政策](./SECURITY.md) · [MIT](./LICENSE)
+
+接入前可阅读[如何选型](./docs/guide/choosing.md)，也欢迎用中文或英文提交[试用反馈](./docs/contributing/adoption.md)。
 
 技术来源：[Modern.js](https://github.com/web-infra-dev/modern.js)、[Next.js](https://nextjs.org/docs/app)、[React Router](https://reactrouter.com/)、[TanStack Router](https://github.com/TanStack/router)、[Loadable Components](https://github.com/gregberge/loadable-components)。
