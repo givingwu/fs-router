@@ -1,228 +1,132 @@
-import path, { isAbsolute, join, normalize, resolve } from "node:path";
-import type { ChokidarOptions, FSWatcher } from "chokidar";
-import type { UnpluginFactory } from "unplugin";
+import { isAbsolute, relative, sep } from "node:path";
+import type { UnpluginFactory, UnpluginOptions } from "unplugin";
 import { getConfig, type PluginConfig } from "./config";
 import { generator } from "./generator";
 
 const PLUGIN_NAME = "unplugin:file-based-router-generator";
+type Compiler =
+	| Parameters<NonNullable<UnpluginOptions["webpack"]>>[0]
+	| Parameters<NonNullable<UnpluginOptions["rspack"]>>[0];
 
-export interface RouterGeneratorPluginContext {
-	root: string;
-	config: PluginConfig;
-	watcher: FSWatcher | null;
-	lock: boolean;
-	generated: boolean;
+function watchDependencies(values: Iterable<string>) {
+	const dependencies = new Set(values);
+	// Rspack's native watcher also requires incremental dependency collections.
+	return Object.assign(dependencies, {
+		added: dependencies,
+		removed: new Set<string>(),
+	});
 }
 
-/**
- * Router generator plugin factory
- *
- * @description This factory is inspired by the `router-generator-plugin` from TanStack's `router` package.
- * @inspiration {@see @link [packages/router-plugin/src/core/router-generator-plugin.ts](https://github.com/TanStack/router/blob/main/packages/router-plugin/src/core/router-generator-plugin.ts)}
- * @param userOptions
- * @returns
- */
+/** Plugin structure inspired by https://github.com/TanStack/router/tree/main/packages/router-plugin */
 export const unpluginRouterGeneratorFactory: UnpluginFactory<
 	Partial<PluginConfig> | undefined
-> = (userOptions = {}) => {
-	const ctx: RouterGeneratorPluginContext = {
-		root: process.cwd(),
-		config: getConfig(userOptions, process.cwd()),
-		watcher: null,
-		lock: false,
-		generated: false,
-	};
-
-	const getRoutesDirectoryPath = () => {
-		return isAbsolute(ctx.config.routesDirectory)
-			? ctx.config.routesDirectory
-			: join(ctx.root, ctx.config.routesDirectory);
-	};
-
-	const generate = async () => {
-		if (ctx.lock) return;
-		ctx.lock = true;
-		try {
-			const content = await generator(ctx.config);
-			ctx.generated = true;
-			return content;
-		} catch (err) {
-			console.error(`❌ [${PLUGIN_NAME}] Route generation failed:`, err);
-			throw err;
-		} finally {
-			ctx.lock = false;
-		}
-	};
-
-	const run = async (cb: () => Promise<unknown>) => {
-		if (ctx.config.enableGeneration ?? true) {
-			await cb();
-		}
-	};
-
-	const handleFile = async (
-		file: string,
-		event: "create" | "update" | "delete",
-	) => {
-		const filePath = normalize(file);
-
-		if (
-			event === "update" &&
-			filePath === resolve(ctx.config.generatedRoutesPath)
-		) {
-			// 跳过生成的路由文件的更新
-			return;
-		}
-
-		const routesDirectoryPath = getRoutesDirectoryPath();
-		const relative = path.relative(routesDirectoryPath, filePath);
-		const fileInRoutesDirectory = relative !== "" && !relative.startsWith("..");
-		if (fileInRoutesDirectory) {
-			await run(generate);
-		}
-	};
-
-	const setupWatcher = async () => {
-		const { watch } = await import("chokidar");
-		const routesDirectoryPath = getRoutesDirectoryPath();
-
-		const watchOptions: ChokidarOptions = {
-			ignored: [
-				/(^|[/\\])\../,
-				"node_modules",
-				"**/*.d.ts",
-				"**/styles/**",
-				"**/*.css",
-				"**/*.less",
-				"**/*.sass",
-				"**/*.scss",
-			],
-			ignoreInitial: true,
-			ignorePermissionErrors: true,
-		};
-
-		ctx.watcher = watch(routesDirectoryPath, watchOptions);
-
-		const debounce = <T extends unknown[]>(
-			fn: (...args: T) => void,
-			delay: number,
-		) => {
-			let timeout: NodeJS.Timeout;
-			return (...args: T) => {
-				clearTimeout(timeout);
-				timeout = setTimeout(() => fn(...args), delay);
-			};
-		};
-
-		// Watch events have no bundler promise to reject; report and keep watching.
-		const debouncedGenerate = debounce(() => {
-			void run(generate).catch(() => {
-				// generate() already reported the error; a later edit can recover.
+> = (userOptions = {}, meta) => {
+	let root = process.cwd();
+	let config = getConfig(userOptions, root);
+	// Serialize requests instead of dropping edits received during generation.
+	let pending = Promise.resolve();
+	const generate = () => {
+		const next = pending
+			.catch(() => {})
+			.then(async () => {
+				if (config.enableGeneration) await generator(config);
 			});
-		}, 300);
-
-		ctx.watcher
-			.on("add", debouncedGenerate)
-			.on("unlink", debouncedGenerate)
-			.on("change", debouncedGenerate)
-			.on("error", (error) => {
-				console.error(`❌ [${PLUGIN_NAME}] Watcher error:`, error);
-			});
+		pending = next;
+		return next;
+	};
+	const routeDirectories = () => [
+		config.routesDirectory,
+		...(config.typeGenerateOptions?.routesDirectories?.map(
+			(directory) => directory.path,
+		) ?? []),
+	];
+	const contains = (file: string) => {
+		return routeDirectories().some((directory) => {
+			const rel = relative(directory, file);
+			return rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+		});
+	};
+	const setRoot = (value: string) => {
+		root = value;
+		config = getConfig(userOptions, root);
+	};
+	const configureCompiler = (compiler: Compiler) => {
+		setRoot(compiler.context);
+		let files = watchDependencies([]);
+		let directories = watchDependencies(routeDirectories());
+		let missing = watchDependencies([]);
+		const beforeBuild = async () => {
+			await generate();
+			if (config.enableGeneration) {
+				// The host snapshot precedes watchRun; invalidate generated modules
+				// in this compilation, not only in a later filesystem event.
+				compiler.inputFileSystem?.purge?.(config.generatedRoutesPath);
+				if (compiler.modifiedFiles)
+					compiler.modifiedFiles = new Set([
+						...Array.from(compiler.modifiedFiles),
+						config.generatedRoutesPath,
+					]);
+			}
+		};
+		compiler.hooks.beforeRun.tapPromise(PLUGIN_NAME, beforeBuild);
+		compiler.hooks.watchRun.tapPromise(PLUGIN_NAME, async () => {
+			// A rejected generation skips afterCompile. Subscribe before awaiting
+			// it on every run so route edits can recover initial and later failures.
+			// Watching owns cleanup and retains the last compilation's dependencies.
+			if (config.enableGeneration)
+				compiler.watching?.watch(files, directories, missing);
+			await beforeBuild();
+		});
+		compiler.hooks.afterCompile.tap(PLUGIN_NAME, (compilation) => {
+			if (!config.enableGeneration) return;
+			for (const directory of routeDirectories())
+				compilation.contextDependencies.add(directory);
+			// Copy Rspack's native-backed collections while this compilation is live.
+			files = watchDependencies(compilation.fileDependencies);
+			directories = watchDependencies(compilation.contextDependencies);
+			missing = watchDependencies(compilation.missingDependencies);
+		});
 	};
 
 	return {
 		name: PLUGIN_NAME,
-
-		buildStart() {
-			ctx.config = getConfig(userOptions, ctx.root);
-
-			if (!isAbsolute(ctx.config.routesDirectory)) {
-				ctx.config.routesDirectory = resolve(
-					ctx.root,
-					ctx.config.routesDirectory,
-				);
-			}
-		},
-
-		async watchChange(id, { event }) {
-			await run(async () => {
-				await handleFile(id, event);
-			});
-		},
-
+		buildStart: meta.framework === "vite" ? generate : undefined,
+		watchChange:
+			meta.framework === "vite"
+				? async (id) => {
+						if (contains(id)) await generate();
+					}
+				: undefined,
 		vite: {
-			async configResolved(config) {
-				ctx.root = config.root;
-				ctx.config = getConfig(userOptions, ctx.root);
-
-				await run(generate);
+			configResolved(resolved) {
+				setRoot(resolved.root);
 			},
-
-			configureServer() {
-				return () => {
-					console.info(`✅ [${PLUGIN_NAME}] Routes generated successfully`);
+			configureServer(server) {
+				// Vite's watcher owns its lifecycle. New/deleted files are not yet
+				// necessarily in its module graph, so handle structural edits here.
+				if (!config.enableGeneration) return;
+				server.watcher.add(routeDirectories());
+				const onStructure = (file: string) => {
+					if (!contains(file)) return;
+					void generate()
+						.then(() => server.ws.send({ type: "full-reload" }))
+						.catch((error: unknown) => {
+							const message =
+								error instanceof Error ? error.message : String(error);
+							server.config.logger.error(message);
+							server.ws.send({
+								type: "error",
+								err: { message, stack: "", plugin: PLUGIN_NAME },
+							});
+						});
 				};
-			},
-
-			handleHotUpdate({ file }) {
-				const normalizedFile = normalize(file);
-				const normalizedRoutesDir = normalize(ctx.config.routesDirectory);
-				if (normalizedFile.startsWith(normalizedRoutesDir)) {
-					return [];
-				}
+				server.watcher.on("add", onStructure).on("unlink", onStructure);
+				server.httpServer?.once("close", () => {
+					server.watcher.off("add", onStructure).off("unlink", onStructure);
+				});
 			},
 		},
-
-		webpack(compiler) {
-			if (compiler.options.mode === "production") {
-				compiler.hooks.beforeRun.tapPromise(PLUGIN_NAME, async () => {
-					await run(generate);
-				});
-
-				compiler.hooks.done.tap(PLUGIN_NAME, () => {
-					console.info(`✅ ${PLUGIN_NAME}: Routes generated successfully`);
-				});
-			} else {
-				setupWatcher();
-
-				let generated = false;
-
-				compiler.hooks.watchRun.tapPromise(PLUGIN_NAME, async () => {
-					if (!generated) {
-						generated = true;
-						return run(generate);
-					}
-				});
-			}
-		},
-
-		rspack(compiler) {
-			if (compiler.options.mode === "production") {
-				compiler.hooks.beforeRun.tapPromise(PLUGIN_NAME, async () => {
-					await run(generate);
-				});
-
-				compiler.hooks.done.tap(PLUGIN_NAME, () => {
-					console.info(`✅ [${PLUGIN_NAME}] Routes generated successfully`);
-				});
-			} else {
-				setupWatcher();
-
-				let generated = false;
-				compiler.hooks.watchRun.tapPromise(PLUGIN_NAME, async () => {
-					if (!generated) {
-						generated = true;
-						return run(generate);
-					}
-				});
-			}
-		},
-
-		async buildEnd() {
-			if (ctx.watcher) {
-				await ctx.watcher.close();
-				ctx.watcher = null;
-			}
-		},
+		webpack: configureCompiler,
+		rspack: configureCompiler,
 	};
 };

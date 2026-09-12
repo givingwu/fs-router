@@ -69,6 +69,7 @@ describe("RouteExtractor", () => {
 								type: "nested",
 								clientData: "@/nested-routes/user/$.data.client",
 								data: "@/nested-routes/user/$.data",
+								action: "@/nested-routes/user/$.data",
 								config: "@/nested-routes/user/$.config.ts",
 							},
 							{

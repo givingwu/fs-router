@@ -13,7 +13,7 @@ export default defineConfig({
 			},
 			format: "esm",
 			syntax: "es2021",
-			dts: true,
+			dts: false,
 		},
 		{
 			source: {
@@ -25,6 +25,7 @@ export default defineConfig({
 				},
 			},
 			format: "cjs",
+			dts: false,
 			syntax: "es2021",
 		},
 	],

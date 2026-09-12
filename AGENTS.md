@@ -16,7 +16,7 @@
 
 ### 技术栈
 
-- **Runtime**: React 18+, React Router v6+
+- **Runtime**: React 18.3.1 / 19.2.8, React Router 7.18.3+
 - **Build**: rslib (基于 Rspack)
 - **Test**: Vitest
 - **Docs**: Rspress

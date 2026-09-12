@@ -119,11 +119,11 @@ describe("build plugin boundaries", () => {
 		await delay(25);
 		expect(exit).not.toHaveBeenCalled();
 		expect(await readFile(join(root, "generated.tsx"), "utf8")).toContain(
-			"export const routes = [",
+			"export const routes: RouteObject[] = [",
 		);
 	});
 
-	it("generates dynamic route declarations through the maintained glob API", async () => {
+	it("generates dynamic route declarations with a prefix", async () => {
 		const { root } = await fixture();
 		await mkdir(join(root, "routes/users/[id]"), { recursive: true });
 		await writeFile(

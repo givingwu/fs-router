@@ -1,5 +1,6 @@
 import * as fs from "node:fs";
 import * as path from "node:path";
+import { pathParser } from "../core/path-parser";
 import { JS_EXTENSIONS, NESTED_ROUTE } from "./constants";
 import type { RouteNode } from "./type";
 import {
@@ -19,6 +20,7 @@ export interface ExtractorOptions {
 	entryName?: string;
 	isMainEntry?: boolean;
 	alias?: AliasOptions;
+	routeExtensions?: string[];
 }
 
 export type NestedRouteType = typeof NESTED_ROUTE;
@@ -34,12 +36,14 @@ const conventionNames: ConventionNameType[] = Object.values(NESTED_ROUTE);
  */
 export class RouteExtractor {
 	private readonly routesDir: string;
+	private readonly extensions: string[];
 	private readonly entryName: string;
 	private readonly isMainEntry: boolean;
 	private readonly alias: AliasOptions;
 
 	constructor(options: ExtractorOptions) {
 		this.routesDir = options.routesDir;
+		this.extensions = options.routeExtensions ?? [...JS_EXTENSIONS];
 		this.entryName = options.entryName || "main";
 		this.isMainEntry = options.isMainEntry ?? true;
 		this.alias = options.alias || {
@@ -51,40 +55,25 @@ export class RouteExtractor {
 	async extract(): Promise<RouteNode[]> {
 		const route = await this.walkDirectory(this.routesDir);
 		if (!route) return [];
-		return this.optimizeRoute(route);
+		const routes = this.optimizeRoute(route);
+		this.validateConflicts(routes);
+		return routes;
 	}
 
 	private async walkDirectory(dirname: string): Promise<RouteNode | null> {
-		if (
-			!(await fs.promises
-				.access(dirname)
-				.then(() => true)
-				.catch(() => false))
-		) {
-			return null;
-		}
-
-		const stats = await fs.promises.stat(dirname);
-
-		if (!stats.isDirectory()) {
-			return null;
-		}
+		const stats = await fs.promises.lstat(dirname);
+		if (!stats.isDirectory() || stats.isSymbolicLink())
+			throw new Error(`Routes directory must be a real directory: ${dirname}`);
 
 		const alias = this.alias;
 		const relativeDir = path.relative(this.routesDir, dirname);
 		const pathSegments = relativeDir.split(path.sep);
 		const lastSegment = pathSegments[pathSegments.length - 1];
 		const isRoot = lastSegment === "";
-		const isPathlessLayout = lastSegment.startsWith("__");
-		const isWithoutLayoutPath = lastSegment.includes(".");
-
-		let routePath = isRoot || isPathlessLayout ? "/" : `${lastSegment}`;
-
-		if (isWithoutLayoutPath) {
-			routePath = lastSegment.split(".").join("/");
-		}
-
-		routePath = this.replaceDynamicPath(routePath);
+		const isPathlessLayout =
+			lastSegment.startsWith("__") ||
+			(lastSegment.startsWith("(") && lastSegment.endsWith(")"));
+		const routePath = isRoot ? "/" : pathParser(`${lastSegment}/page`).route;
 
 		const route: RouteNode = {
 			path: routePath?.replace(/\$$/, "?"),
@@ -107,7 +96,8 @@ export class RouteExtractor {
 		let splatData = "";
 		let splatAction = "";
 
-		const entries = await fs.promises.readdir(dirname);
+		const entries = (await fs.promises.readdir(dirname)).sort();
+		const conventions = new Map<string, string>();
 
 		for (const entry of entries) {
 			const entryPath = path.join(dirname, entry);
@@ -117,7 +107,14 @@ export class RouteExtractor {
 			const extname = path.extname(entry) as ExtensionNameType;
 			const entryWithoutExt = entry.slice(0, -extname.length);
 
-			const isDirectory = (await fs.promises.stat(entryPath)).isDirectory();
+			const entryStats = await fs.promises.lstat(entryPath);
+			if (
+				entryStats.isSymbolicLink() ||
+				entry.startsWith(".") ||
+				entry === "node_modules"
+			)
+				continue;
+			const isDirectory = entryStats.isDirectory();
 
 			if (isDirectory) {
 				const childRoute = await this.walkDirectory(entryPath);
@@ -125,15 +122,23 @@ export class RouteExtractor {
 				if (childRoute && !Array.isArray(childRoute)) {
 					route.children?.push(childRoute);
 				}
+				continue;
 			}
 
 			if (
-				extname &&
-				(!JS_EXTENSIONS.includes(extname) ||
-					!conventionNames.includes(entryWithoutExt as ConventionNameType))
+				!entryStats.isFile() ||
+				!extname ||
+				!this.extensions.includes(extname) ||
+				!conventionNames.includes(entryWithoutExt as ConventionNameType)
 			) {
 				continue;
 			}
+
+			if (conventions.has(entryWithoutExt))
+				throw new Error(
+					`Duplicate route convention: ${conventions.get(entryWithoutExt)} and ${entryPath}`,
+				);
+			conventions.set(entryWithoutExt, entryPath);
 
 			if (entryWithoutExt === NESTED_ROUTE.LAYOUT_LOADER_FILE) {
 				if (!route.loader) {
@@ -270,6 +275,23 @@ export class RouteExtractor {
 			}
 		}
 
+		if (pageRoute)
+			Object.assign(pageRoute, {
+				loader: pageLoaderFile || undefined,
+				config: pageConfigFile || undefined,
+				data: pageData || undefined,
+				clientData: pageClientData || undefined,
+				action: pageAction || undefined,
+			});
+		if (splatRoute)
+			Object.assign(splatRoute, {
+				loader: splatLoaderFile || undefined,
+				config: splatConfigFile || undefined,
+				data: splatData || undefined,
+				clientData: splatClientData || undefined,
+				action: splatAction || undefined,
+			});
+
 		let finalRoute = this.createRoute(
 			route,
 			path.join(dirname, `${NESTED_ROUTE.LAYOUT_FILE}.ts`),
@@ -291,6 +313,11 @@ export class RouteExtractor {
 		);
 		const childRoutes = finalRoute.children;
 
+		if (isRoot && !finalRoute._component) {
+			throw new Error(
+				"The root layout component is required, make sure the routes/layout.tsx file exists.",
+			);
+		}
 		if (
 			childRoutes &&
 			childRoutes.length === 0 &&
@@ -320,12 +347,6 @@ export class RouteExtractor {
 			}
 		}
 
-		if (isRoot && !finalRoute._component) {
-			throw new Error(
-				"The root layout component is required, make sure the routes/layout.tsx file exists.",
-			);
-		}
-
 		return finalRoute;
 	}
 
@@ -339,7 +360,10 @@ export class RouteExtractor {
 			!routeTree.error &&
 			!routeTree.loading &&
 			!routeTree.config &&
-			!routeTree.clientData
+			!routeTree.clientData &&
+			!routeTree.loader &&
+			!routeTree.data &&
+			!routeTree.action
 		) {
 			const newRoutes = routeTree.children.map((child) => {
 				const routePath = `${routeTree.path || ""}${child.path ? `/${child.path}` : ""}`;
@@ -373,8 +397,33 @@ export class RouteExtractor {
 		];
 	}
 
-	private replaceDynamicPath(routePath: string): string {
-		return routePath.replace(/\[(.*?)\]/g, ":$1");
+	private validateConflicts(routes: RouteNode[]): void {
+		const seen = new Map<string, string>();
+		const ids = new Set<string>();
+		const visit = (nodes: RouteNode[], parent: string) => {
+			for (const node of nodes) {
+				if (node.id) {
+					if (ids.has(node.id))
+						throw new Error(`Conflicting route id: ${node.id}`);
+					ids.add(node.id);
+				}
+				const full =
+					`${parent}/${node.path ?? ""}`
+						.replace(/\/+/g, "/")
+						.replace(/\/$/, "") || "/";
+				// Layout + index is intentional; competing terminal routes are not.
+				if (node.index || (!node.children?.length && node._component)) {
+					const key = full.replace(/:[^/?]+/g, ":param").toLowerCase();
+					if (seen.has(key))
+						throw new Error(
+							`Conflicting routes: ${seen.get(key)} and ${node.id} (${full})`,
+						);
+					seen.set(key, node.id ?? full);
+				}
+				if (node.children) visit(node.children, full);
+			}
+		};
+		visit(routes, "");
 	}
 
 	private getRouteId(componentPath: string): string {

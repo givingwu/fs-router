@@ -8,5 +8,10 @@
     "type": "file",
     "name": "from-react-router",
     "label": "从 React Router 迁移"
+  },
+  {
+    "type": "file",
+    "name": "v0.1",
+    "label": "迁移到 0.1"
   }
 ]

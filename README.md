@@ -1,246 +1,111 @@
-<div align="center">
-<img src="./docs/public/logo.svg" alt="Logo" width="64" height="64" />
-
 # @feoe/fs-router
 
-[![npm version](https://img.shields.io/npm/v/@feoe/fs-router.svg)](https://www.npmjs.com/package/@feoe/fs-router)
-[![npm downloads](https://img.shields.io/npm/dm/@feoe/fs-router.svg)](https://www.npmjs.com/package/@feoe/fs-router)
-[![license](https://img.shields.io/npm/l/@feoe/fs-router.svg)](https://github.com/givingwu/fs-router/blob/main/LICENSE)
+为现有 React 应用生成 React Router 路由配置，支持 Vite、Webpack 和 Rspack。约定文件生成普通 TSX，应用自行创建 `createBrowserRouter`，不需要迁入完整框架。
 
+[文档](https://givingwu.github.io/fs-router/) · [兼容性与限制](./docs/guide/compatibility.md) · [0.1 迁移](./docs/guide/migration/v0.1.md) · [发布流程](./docs/contributing/release.md)
 
-**基于文件的约定式路由**
+> 此分支准备 **0.1.0**，尚未发布。npm 上的旧版本不代表本分支的能力；正式发布前可用下述 tarball 验证流程试用。
 
-为 React 应用提供类型安全的路由解决方案
+## 支持范围
 
-[文档](https://givingwu.github.io/fs-router/) | [快速开始](#-安装) | [示例](#-示例)
+| 项目 | 本分支验证基线 |
+| --- | --- |
+| Node.js | 22.12.0、24.20.0；包要求 >=22.12.0 |
+| React / React DOM | 配对的 18.3.1 或 19.2.8 |
+| React Router DOM | 7.18.3；不再声明支持 Router 6 |
+| 构建工具 | Vite 6.4.3、Webpack 5.110.3、Rspack 1.7.12 |
+| TypeScript | 5.9.3；公共 API 支持 Bundler / NodeNext ESM、CJS；生成的 TSX 用 Bundler 解析 |
 
-</div>
+这是经过测试的版本组合，不是对所有历史版本或新主版本的保证。具体环境、复现命令及尚未验证的平台见兼容性页。
 
-## ✨ 特性
+## 安装与接入
 
-- 🚀 **约定式路由** - 基于文件系统的路由约定，零配置即可使用
-- 📝 **最佳实践** - 自带 React Router v6+ BrowserRouter/DataRouter 组件模块化
-- 🔒 **类型安全** - 完整的 TypeScript 支持，提供类型安全的导航
-- ⚡ **高性能** - 默认开启代码分割和懒加载，优化应用性能
-- 🔄 **热更新** - 开发时文件变更自动重新生成路由文件
-- 🔧 **多构建工具支持** - 支持 Vite、Webpack、Rspack 等主流构建工具
+发布后安装 `@feoe/fs-router@0.1.0`；当前可从源码 `pnpm install --frozen-lockfile && pnpm check:consumers` 生成并验证 `.artifacts/feoe-fs-router-0.1.0.tgz`，再在应用中安装该文件。
 
-## 📦 安装
+应用需要这些 peer 依赖（React 与 React DOM 保持同版本）：
 
-```bash
-npm install @feoe/fs-router -D
-# 或
-yarn add @feoe/fs-router -D
-# 或
-pnpm add @feoe/fs-router -D
+```sh
+npm install react@18.3.1 react-dom@18.3.1 react-router-dom@7.18.3 @loadable/component@5.16.7
+npm install -D typescript@5.9.3 @types/react@18.3.31 @types/react-dom@18.3.7 @types/loadable__component@5.13.10
 ```
 
-## 系统要求
+库根入口含运行时 hook；使用该 hook 的应用应把库放在 `dependencies` 中。构建适配器从子路径导入：
 
-- Node.js 16.0 或更高版本
-- React 18.0 或更高版本
-- TypeScript 4.5 或更高版本（可选，但推荐）
-- React Router 6.0 或更高版本
+```ts
+// vite.config.ts（应用已有 React 插件/JSX 配置）
+import { defineConfig } from 'vite';
+import fileBasedRouter from '@feoe/fs-router/vite';
 
-## 🚀 快速开始
-
-### 1. 配置构建工具
-
-根据你使用的构建工具，选择对应的配置方式：
-
-#### Vite
-
-```typescript
-// vite.config.ts
-import { defineConfig } from 'vite'
-import { FileBasedRouterVite as fileBasedRouter } from '@feoe/fs-router/vite'
-
-export default defineConfig({
-  plugins: [
-    fileBasedRouter({
-      routesDirectory: 'src/routes',
-      generatedRoutesPath: 'src/routes.tsx'
-    })
-  ]
-})
+export default defineConfig({ plugins: [fileBasedRouter()] });
 ```
 
-#### Rspack
+Webpack / Rspack 分别使用 `@feoe/fs-router/webpack`、`@feoe/fs-router/rspack`，支持默认导出以及 `FileBasedRouterWebpack` / `FileBasedRouterRspack` 具名导出。CommonJS 用 `require('@feoe/fs-router/webpack').default`。应用仍需配置 TSX loader 和 `.tsx/.ts` 扩展名解析，完整可执行验证见 `tests/consumers/verify.mjs`。
 
-```javascript
-// rspack.config.js
-const { FileBasedRouterRspack as fileBasedRouter } = require('@feoe/fs-router/rspack')
+创建文件：
 
-module.exports = {
-  plugins: [
-    fileBasedRouter({
-      routesDirectory: 'src/routes',
-      generatedRoutesPath: 'src/routes.tsx'
-    })
-  ]
-}
-```
-
-#### Webpack
-
-```javascript
-// webpack.config.js
-const { FileBasedRouterWebpack as fileBasedRouter } = require('@feoe/fs-router/webpack')
-
-module.exports = {
-  plugins: [
-    fileBasedRouter({
-      routesDirectory: 'src/routes',
-      generatedRoutesPath: 'src/routes.tsx'
-    })
-  ]
-}
-```
-
-### 2. 创建路由文件
-
-在 `src/routes` 目录下创建页面文件：
-
-```
+```text
 src/routes/
-├── layout.tsx          # 根布局 (必须配置)
-├── page.tsx            # 首页 (/)
-├── about/
-│   └── page.tsx        # 关于页面 (/about)
-└── users/
-    ├── layout.tsx      # 用户模块布局
-    ├── page.tsx        # 用户列表 (/users)
-    └── [id]/
-        └── page.tsx    # 用户详情 (/users/:id)
+├── layout.tsx       # 必需的根布局
+├── page.tsx         # /
+└── users/[id]/
+    └── page.tsx     # /users/:id
 ```
-
-### 3. 创建根布局
 
 ```tsx
 // src/routes/layout.tsx
-import { Outlet } from 'react-router-dom'
+import { Outlet } from 'react-router-dom';
+export default function Layout() { return <main><Outlet /></main>; }
 
-export default function Layout() {
-  return (
-    <div>
-      <nav>
-        <a href="/">首页</a>
-        <a href="/about">关于</a>
-        <a href="/users">用户</a>
-      </nav>
-      <main>
-        <Outlet />
-      </main>
-    </div>
-  )
-}
+// src/routes/page.tsx（users/[id]/page.tsx 同样导出页面组件）
+export default function Page() { return <h1>Example</h1>; }
 ```
 
-### 4. 创建页面组件
-
-```tsx
-// src/routes/page.tsx
-export default function HomePage() {
-  return (
-    <div>
-      <h1>欢迎使用 @feoe/fs-router</h1>
-      <p>这是基于文件的约定式路由示例</p>
-    </div>
-  )
-}
-```
-
-### 5. 在应用中使用
+启动构建工具后生成 `src/routes.tsx` 和 `src/routes-type.ts`，输出文件须在路由目录外；把它们纳入应用的 TypeScript include。默认不依赖 `@` 别名。
 
 ```tsx
 // src/main.tsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import { routes } from './routes'
+import { createRoot } from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { routes } from './routes';
 
-const router = createBrowserRouter(routes)
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
-)
+createRoot(document.getElementById('root')!).render(
+  <RouterProvider router={createBrowserRouter(routes)} />,
+);
 ```
 
-## 📖 核心概念
+## 路由与导航
 
-### 约定式路由
-
-基于文件系统的路由约定，通过文件和目录结构自动生成路由配置：
-
-- `page.tsx` - 页面组件
-- `page.data.ts` - 页面数据加载 loader
-- `layout.tsx` - 布局组件
-- `layout.data.ts` - 布局数据加载 loader
-- `loading.tsx` - 加载状态组件
-- `error.tsx` - 错误边界组件
-- `loader.ts` - 数据加载器
-
-### 动态路由
-
-使用方括号创建动态路由：
-
-```
-src/routes/
-├── users/
-│   ├── [id]/
-│   │   └── page.tsx    # /users/:id
-│   └── [id]/
-│       └── edit/
-│           └── page.tsx # /users/:id/edit
-```
-
-### 类型安全
-
-自动生成类型定义，提供完整的 TypeScript 支持：
+- `page.tsx` / `layout.tsx`：页面、嵌套布局；布局用 `Outlet` 渲染子路由。
+- `page.data.ts` / `layout.data.ts`：具名 `loader`，可选具名 `action`。
+- `page.loader.ts` / `layout.loader.ts`：默认导出的 loader。单独 `loader.ts` 不受支持。
+- `loading.tsx` / `error.tsx`：加载占位、错误边界组件；`splitting: false` 时不生成懒加载占位。
+- `[id]`、`[[id]]` / `[id$]`、`[...path]`、`$.tsx`：动态参数、可选参数、通配路由。
+- `(group)`、`__group` 不加入 URL；点分目录转换为多段路径。
 
 ```tsx
-import { useNavigate } from 'react-router-dom'
+import { useNavigation } from '@feoe/fs-router';
 
-const navigate = useNavigate()
-
-// 类型安全的导航
-navigate('/users/123')  // ✅ 正确
-navigate('/invalid')    // ❌ TypeScript 错误
+function OpenUser() {
+  const navigation = useNavigation();
+  return <button onClick={() => navigation.push('/users/:id', { id: '42' })}>Open</button>;
+}
 ```
 
-## 🎯 示例
+生成声明后，上述 hook 校验已知路由和参数；React Router 自带的 `useNavigate` 不会因此获得这些约束。类型检查不能替代运行时输入验证。
 
-查看完整的示例项目：
+默认用 `@loadable/component` 分割非根组件；根布局和 loader 保持静态导入。开发中增删路由会重新生成，结构变化可能完整刷新页面。没有发布性能对比数据，不承诺 SSR、RSC 或框架式服务端数据隔离。
 
-- [Vite + Keep Alive Tabs](./examples/vite-keep-alive-tabs) - 带有标签页保活功能的 Vite 应用
-- [Rspack Admin Dashboard](./examples/kn-admin) - 基于 Rspack 的管理后台应用
+## 验证与贡献
 
-## 📚 文档
+```sh
+pnpm install --frozen-lockfile
+pnpm check && pnpm typecheck && pnpm test
+pnpm check:consumers
+pnpm docs:build && pnpm docs:check
+```
 
-完整的文档和 API 参考请访问：[https://givingwu.github.io/fs-router/](https://givingwu.github.io/fs-router/)
+消费者检查实际安装 tarball，在独立目录验证 ESM/CJS、类型、三种构建器、路由匹配、loader/action、导航和增删文件监听。旧 `examples/` 项目尚未纳入这份兼容承诺，历史独立锁文件风险见安全审计。
 
-- [介绍](/docs/guide/start/introduction.md)
-- [快速开始](/docs/guide/start/getting-started.md)
-- [基础用法](/docs/guide/basic/file-based-routing.md)
-- [高级特性](/docs/guide/advanced/type-safety.md)
-- [API 参考](/docs/api/index.md)
+[贡献指南](./CONTRIBUTING.md) · [安全政策](./SECURITY.md) · [MIT](./LICENSE)
 
-## 🤝 贡献
-
-欢迎贡献代码！请查看 [贡献指南](./docs/contributing/index.md) 了解如何参与项目开发。
-
-## 🙏 致谢
-
-本项目的灵感来源于以下优秀的开源项目：
-
-- [Modern.js](https://github.com/web-infra-dev/modern.js) - 约定式路由设计参考
-- [Next.js App Router](https://nextjs.org/docs/app) - 文件系统路由约定
-- [Remix File System Route Convention](https://remix.run/docs/en/main/start/v2#file-system-route-convention)
-- [@TanStack/react-router](https://tanstack.com/router/latest/docs/framework/react/routing/file-based-routing) - 类型安全实现参考
-- [@loadable/component](https://github.com/gregberge/loadable-components) - 代码分割实现
-
-## 📄 许可证
-
-[MIT](./LICENSE) © [givingwu](https://github.com/givingwu)
+技术来源：[Modern.js](https://github.com/web-infra-dev/modern.js)、[Next.js](https://nextjs.org/docs/app)、[React Router](https://reactrouter.com/)、[TanStack Router](https://github.com/TanStack/router)、[Loadable Components](https://github.com/gregberge/loadable-components)。

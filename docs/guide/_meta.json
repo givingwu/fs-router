@@ -28,5 +28,10 @@
     "type": "dir",
     "name": "faq",
     "label": "常见问题"
+  },
+  {
+    "type": "file",
+    "name": "compatibility",
+    "label": "兼容性与限制"
   }
 ]

@@ -18,9 +18,8 @@
 
 ## 当前已知限制
 
-根包保留 React Router 6 兼容性，仍受以下上游中危公告影响：
+当前候选版本 0.1.0 要求 React Router DOM 7.18.3+，已迁移到上游两项历史中危问题的修复线。npm 旧版本不因此自动修复；升级前参见 [迁移说明](docs/guide/migration/v0.1.md)。
 
-- [非预期外部跳转](https://github.com/remix-run/react-router/security/advisories/GHSA-wrjc-x8rr-h8h6)：不要把攻击者提供的路径直接传入导航 API；类型约束不能替代运行时校验。
-- [SSR hydration 构造器注入](https://github.com/remix-run/react-router/security/advisories/GHSA-337j-9hxr-rhxg)：影响特定手动 SSR/hydration 场景；不要让外部输入覆盖序列化错误对象。
+路由源码、构建配置和生成输出路径必须可信。扫描会跳过符号链接，拒绝输出覆盖扫描目录，但不是对恶意并发文件替换的沙箱。生成的 loader/action 是客户端代码，不提供服务端秘密隔离。类型约束不验证来自网络的路径或输入。
 
-两项公告列出的修复版本均为 React Router 7.18.0+，迁移需要单独验证。示例应用有独立依赖树，根包审计结果不覆盖示例；详见 [阶段审计](.github/security-audit-2026-09-11.md)。
+旧示例应用有独立依赖树，根包审计结果不覆盖示例；详见 [阶段审计](.github/security-audit-2026-09-11.md)。

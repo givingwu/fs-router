@@ -22,12 +22,12 @@ describe("RouteCodeGenerator", () => {
 		// console.log(code);
 
 		expect(code).toContain(`import loadable from '@loadable/component';`);
-		expect(code).toContain("export const routes = [");
+		expect(code).toContain("export const routes: RouteObject[] = [");
 		expect(code).toContain(
-			`() => import(/* webpackChunkName: "user/layout" */ '@/user/layout')`,
+			`() => import(/* webpackChunkName: "user/layout" */ "@/user/layout")`,
 		);
 		expect(code).toContain(
-			`() => import(/* webpackChunkName: "user.profile.name/page" */ '@/user.profile.name/page')`,
+			`() => import(/* webpackChunkName: "user.profile.name/page" */ "@/user.profile.name/page")`,
 		);
 	});
 
@@ -45,9 +45,9 @@ describe("RouteCodeGenerator", () => {
 
 		// console.log(code);
 
-		expect(code).toContain(`import Component_0 from '@/__auth/layout'`);
-		expect(code).toContain(`import Component_1 from '@/__auth/__shop/layout';`);
-		expect(code).toContain("export const routes = [");
+		expect(code).toContain(`import Component_0 from "@/__auth/layout"`);
+		expect(code).toContain(`import Component_1 from "@/__auth/__shop/layout";`);
+		expect(code).toContain("export const routes: RouteObject[] = [");
 	});
 
 	it("should handle routes with loaders", () => {
@@ -64,7 +64,7 @@ describe("RouteCodeGenerator", () => {
 
 		// console.log(code);
 
-		expect(code).toContain(`import loader_0 from './loaders/homeLoader';`);
+		expect(code).toContain(`import loader_0 from "./loaders/homeLoader";`);
 		expect(code).toContain("loader: loader_0");
 	});
 
