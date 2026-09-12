@@ -2,7 +2,7 @@
 
 Generate file-based React Router routes for an existing React/TypeScript client application using Vite, Webpack or Rspack.
 
-[English quick start](https://givingwu.github.io/fs-router/english) · [English source guide](./docs/english.md) · [中文](./README.md) · [Runnable example](./examples/minimal-react)
+[English quick start](https://givingwu.github.io/fs-router/english.html) · [English source guide](./docs/english.md) · [中文](./README.md) · [Runnable example](./examples/minimal-react)
 
 The 0.1.0 candidate is **not published**. Try the local tarball with Node 22.12+ or Node 24 LTS:
 

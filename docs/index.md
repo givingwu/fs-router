@@ -1,5 +1,7 @@
 ---
 pageType: home
+titleSuffix: React 文件路由与类型化导航
+description: 为现有 React/TypeScript 应用生成 React Router 文件路由与导航类型，支持 Vite、Webpack 和 Rspack；从可运行示例了解支持范围。
 hero:
   name: '@feoe/fs-router'
   text: 为现有 React 应用生成文件路由

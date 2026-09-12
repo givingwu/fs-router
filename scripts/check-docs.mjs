@@ -97,3 +97,49 @@ for (const file of sourcePages)
 console.log(
 	`Verified ${pages.length} HTML pages, ${references} local references/anchors, Chinese navigation and source page coverage`,
 );
+
+const sitemap = readFileSync(join(root, "sitemap.xml"), "utf8");
+const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+	(match) => match[1],
+);
+assert.equal(
+	sitemapUrls.length,
+	pages.length - 1,
+	"Sitemap must cover every non-404 page",
+);
+assert.equal(
+	new Set(sitemapUrls).size,
+	sitemapUrls.length,
+	"Duplicate sitemap URL",
+);
+for (const url of sitemapUrls) {
+	const parsed = new URL(url);
+	assert.equal(parsed.origin, origin);
+	assert(parsed.pathname.startsWith(base));
+	assert(
+		target(decodeURIComponent(parsed.pathname)),
+		`Broken sitemap URL: ${url}`,
+	);
+	assert(!parsed.pathname.endsWith("404.html"));
+}
+console.log(`Verified ${sitemapUrls.length} sitemap URLs`);
+
+for (const [file, title, summary] of [
+	["index.html", "React 文件路由与类型化导航", "React/TypeScript"],
+	["english.html", "File-based routing for React", "typed navigation"],
+]) {
+	const html = contents.get(join(root, file));
+	assert(
+		html.match(/<title[^>]*>([^<]+)<\/title>/)?.[1].includes(title),
+		`${file}: missing descriptive title`,
+	);
+	const description = [...html.matchAll(/<meta\b[^>]*>/g)].find(([tag]) =>
+		tag.includes('name="description"'),
+	)?.[0];
+	assert(description?.includes(summary), `${file}: missing search summary`);
+	assert(
+		!/<meta[^>]+name="robots"[^>]+noindex/.test(html),
+		`${file}: unexpectedly blocks indexing`,
+	);
+}
+console.log("Verified Chinese and English entry titles and search summaries");

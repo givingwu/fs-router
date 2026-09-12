@@ -27,3 +27,7 @@ dev/build/preview 使用同一份 `docs/.rspress/config.ts`，文档根为 `docs
 `docs:check` 检查构建出的每个本地链接、资源、锚点与中文导航；`docs:smoke` 启动并关闭 dev/preview，通过 Chromium 检查搜索、键盘、移动菜单、图片和基本无障碍。证据写到 `.artifacts/browser`，可重复生成。CI 也运行这些检查。
 
 [部署流程](./deployment-guide.md) 保持现有 main → Pages 权限边界。
+
+## 搜索引擎入口
+
+构建同时生成 `/fs-router/sitemap.xml`，列出除 404 外的公开文档 URL；`docs:check` 验证覆盖范围。站内搜索由 Rspress 的本地索引提供。sitemap 与中英文介绍改善发现入口，但不保证搜索引擎收录、排名或 Star 数。GitHub 仓库 topics 与对外采用计划继续按社区阶段审查。

@@ -1,3 +1,8 @@
+---
+title: File-based routing for React — English quick start
+description: Add file-based React Router routes and typed navigation to an existing React/TypeScript app with Vite, Webpack or Rspack. Run the minimal example locally.
+---
+
 <div lang="en">
 
 # English quick start

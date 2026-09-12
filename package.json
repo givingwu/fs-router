@@ -10,12 +10,16 @@
 	"bugs": {
 		"url": "https://github.com/givingwu/fs-router/issues"
 	},
-	"description": "file system based routing",
+	"description": "File-based routing and typed navigation for existing React Router apps with Vite, Webpack and Rspack.",
 	"keywords": [
-		"file-routing",
-		"file-routes",
-		"file-system-router",
-		"fs-router"
+		"react",
+		"react-router",
+		"typescript",
+		"file-based-routing",
+		"typed-navigation",
+		"vite",
+		"webpack",
+		"rspack"
 	],
 	"publishConfig": {
 		"access": "public"
@@ -77,7 +81,7 @@
 		"prepare": "simple-git-hooks",
 		"prepublishOnly": "pnpm check && pnpm typecheck && pnpm test && pnpm check:consumers",
 		"docs:dev": "rspress dev --config docs/.rspress/config.ts",
-		"docs:build": "rspress build --config docs/.rspress/config.ts",
+		"docs:build": "rspress build --config docs/.rspress/config.ts && node scripts/build-docs-sitemap.mjs",
 		"docs:preview": "rspress preview --config docs/.rspress/config.ts",
 		"check": "biome ci --error-on-warnings .",
 		"check:fix": "biome check --write .",

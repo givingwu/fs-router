@@ -18,7 +18,7 @@ Baseline: main `0971ed7` (library compatibility stage). Local environment: macOS
 | `pnpm check`, `pnpm typecheck`, `git diff --check` | Passed |
 | `pnpm test` | 47 tests passed |
 | `pnpm check:consumers` | React 18/19 tarball consumers passed; four ESM/CJS/type entries, Vite/Rspack/Webpack builds and watch scenarios |
-| `pnpm docs:build && pnpm docs:check` | 37 HTML pages; 1,736 local URL/asset/anchor references; nav/sidebar and old path coverage passed |
+| `pnpm docs:build && pnpm docs:check` | 37 HTML pages; 1,739 local URL/asset/anchor references and 36 sitemap URLs; nav/sidebar and old path coverage passed |
 | `pnpm docs:smoke` | 3 browser tests passed: dev/preview search and keyboard, navigation, mobile menus, images, no page exceptions |
 | axe WCAG A/AA tags | No automated violations on home, quick start and English entry, in both light and dark (six scans) |
 | `pnpm example:setup && pnpm example:check` | Real tarball installation; all three production builds and strict generated navigation type checks passed |
@@ -44,10 +44,17 @@ npx --yes pnpm@10.34.5 docs:smoke
 
 For interactive use run `npm --prefix examples/minimal-react run dev`; stop with Ctrl-C. Browser tests own and close their local servers. Linux CI installs Chromium with `--with-deps`. Screenshots and the accessibility report are written to `.artifacts/browser` and uploaded by the read-only CI job for seven days.
 
+## Discovery metadata
+
+The Chinese homepage and English entry have descriptive titles and summaries, verified in the rendered HTML. The package description and keywords now name React Router, TypeScript and the three verified bundlers. Builds generate a sitemap with 36 non-404 public documentation URLs; CI checks every destination. No indexing, ranking or Star-count guarantee is made.
+
+The repository About text currently reads “Implementation is a routing system based on Modern.js file-system routes style”, with no topics. Prepared About proposal: “File-based routing and typed navigation for existing React Router apps. Vite, Webpack and Rspack adapters.” Proposed topics: `react`, `react-router`, `typescript`, `file-based-routing`, `vite`, `webpack`, `rspack`, `typed-navigation`. These repository metadata edits and outreach belong to the community-stage review; this PR changes source metadata and docs.
+
 ## Sources and limits
 
 - [Rspress 1 automatic navigation](https://v1.rspress.rs/guide/basic/auto-nav-sidebar), [i18n directories](https://v1.rspress.rs/guide/default-theme/i18n), [theme extension](https://v1.rspress.rs/guide/advanced/custom-theme), plus the installed 1.47.2 package source, were checked before choosing the flat-layout solution.
 - [React Router 7.18.3 route objects](https://github.com/remix-run/react-router/blob/react-router%407.18.3/docs/start/data/route-object.md) and [pending UI](https://github.com/remix-run/react-router/blob/react-router%407.18.3/docs/start/data/pending-ui.md) distinguish client Data Router semantics from framework/server functionality.
+- [Google sitemap guidance](https://developers.google.com/search/docs/crawling-indexing/sitemaps/build-sitemap) supports absolute, escaped URLs under the project path; the sitemap is a discovery hint and does not guarantee crawling or indexing.
 - [Playwright web server lifecycle](https://playwright.dev/docs/test-webserver) informs test-owned service cleanup. [upload-artifact v7.0.1](https://github.com/actions/upload-artifact/releases/tag/v7.0.1) was resolved through the official repository to full SHA `043fb46d1a93c77aae656e7c1c64a875d1fc6a0a`.
 
 Automated axe checks on representative pages do not constitute a full accessibility certification or screen-reader audit. Local browser evidence covers Chromium on macOS; Ubuntu browser CI and the existing Node 22/24 quality matrix remain configured. Firefox/WebKit, SSR/RSC and older feature-heavy examples are outside this validation. Browser chunk requests prove splitting behavior, not a performance advantage. External links are reviewed pointers, not a continuous network availability guarantee.
