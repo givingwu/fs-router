@@ -17,3 +17,8 @@ doc_build
 
 # Package verification artifacts
 .artifacts/
+
+# Browser evidence and generated example declarations
+playwright-report/
+test-results/
+examples/minimal-react/src/routes-type.ts

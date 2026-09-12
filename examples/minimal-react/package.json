@@ -1,0 +1,37 @@
+{
+  "name": "fs-router-minimal-react",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build && tsc --noEmit",
+    "build:rspack": "node build.mjs rspack && tsc --noEmit",
+    "build:webpack": "node build.mjs webpack && tsc --noEmit",
+    "build:all": "npm run build && npm run build:rspack && npm run build:webpack",
+    "preview": "vite preview --host 127.0.0.1",
+    "preview:rspack": "node preview.mjs rspack 4174",
+    "preview:webpack": "node preview.mjs webpack 4175"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "7.18.3",
+    "@loadable/component": "5.16.7"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "@types/loadable__component": "5.13.10",
+    "@types/node": "22.20.2",
+    "typescript": "5.9.3",
+    "vite": "6.4.3",
+    "@vitejs/plugin-react": "4.7.0",
+    "webpack": "5.110.3",
+    "@rspack/core": "1.7.12",
+    "ts-loader": "9.6.2",
+    "html-webpack-plugin": "5.6.6"
+  }
+}

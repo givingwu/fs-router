@@ -2,9 +2,27 @@
 
 为现有 React 应用生成 React Router 路由配置，支持 Vite、Webpack 和 Rspack。约定文件生成普通 TSX，应用自行创建 `createBrowserRouter`，不需要迁入完整框架。
 
-[文档](https://givingwu.github.io/fs-router/) · [兼容性与限制](./docs/guide/compatibility.md) · [0.1 迁移](./docs/guide/migration/v0.1.md) · [发布流程](./docs/contributing/release.md)
+[English](./README.en.md) · [文档](https://givingwu.github.io/fs-router/) · [兼容性与限制](./docs/guide/compatibility.md) · [0.1 迁移](./docs/guide/migration/v0.1.md) · [发布流程](./docs/contributing/release.md)
 
 > 此分支准备 **0.1.0**，尚未发布。npm 上的旧版本不代表本分支的能力；正式发布前可用下述 tarball 验证流程试用。
+
+## 是否适合
+
+适合希望在现有 React/TypeScript 客户端应用中引入文件约定、并保留现有构建工具的开发者。需要 SSR/RSC、服务端 loader、Router 6 或完整框架部署时，本版本不提供这些能力。
+
+## 先运行示例
+
+```sh
+git clone https://github.com/givingwu/fs-router.git
+cd fs-router
+npx --yes pnpm@10.34.5 install --frozen-lockfile
+npx --yes pnpm@10.34.5 example:setup
+npm --prefix examples/minimal-react run dev
+# 三种构建器与严格类型检查
+npm --prefix examples/minimal-react run build:all
+```
+
+[最小示例](./examples/minimal-react) 使用本地 tarball、独立锁文件和虚构数据，包含首页、动态 loader、类型导航、错误边界和 404，无需账户或后端。[完整接入指南](./docs/guide/start/getting-started.md) 包含 HTML、React 插件和生成顺序。
 
 ## 支持范围
 
@@ -104,7 +122,7 @@ pnpm check:consumers
 pnpm docs:build && pnpm docs:check
 ```
 
-消费者检查实际安装 tarball，在独立目录验证 ESM/CJS、类型、三种构建器、路由匹配、loader/action、导航和增删文件监听。旧 `examples/` 项目尚未纳入这份兼容承诺，历史独立锁文件风险见安全审计。
+消费者检查实际安装 tarball，在独立目录验证 ESM/CJS、类型、三种构建器、路由匹配、loader/action、导航和增删文件监听。最小示例另有 Chromium 页面验证；其他历史 `examples/` 工程未纳入兼容承诺。
 
 [贡献指南](./CONTRIBUTING.md) · [安全政策](./SECURITY.md) · [MIT](./LICENSE)
 

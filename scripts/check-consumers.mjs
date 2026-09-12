@@ -34,7 +34,7 @@ const tarball = process.env.FS_ROUTER_TARBALL
 if (manifest) {
 	assert(
 		manifest.files.every((file) =>
-			/^(dist\/|package\.json$|README\.md$|LICENSE$)/.test(file.path),
+			/^(dist\/|package\.json$|README(?:\.en)?\.md$|LICENSE$)/.test(file.path),
 		),
 		"unexpected file in tarball",
 	);

@@ -31,7 +31,7 @@
    - 安装 pnpm 包管理器
    - 按锁文件安装项目依赖（`pnpm install --frozen-lockfile`）
    - 构建 RSPress 文档
-   - 验证 `/fs-router/` 路径与本地静态资源，上传 `doc_build`
+   - 验证 `/fs-router/` 路径、本地页面/锚点与静态资源，上传 `doc_build`
 
 3. **发布步骤**：
    - 独立 `deploy` job 使用 `github-pages` 环境，仅此 job 持有 `pages: write` 和 `id-token: write`
@@ -79,7 +79,7 @@
 
 **解决方案**：
 - 清除浏览器缓存
-- 等待 CDN 缓存更新（通常 5-10 分钟）
+- 核对 CDN 缓存与部署产物，更新时间以实际响应为准
 - 检查部署时间戳确认是否为最新版本
 
 ### 手动部署

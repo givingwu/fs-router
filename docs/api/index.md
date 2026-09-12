@@ -1,17 +1,9 @@
 # API 参考
 
-这里是 @feoe/fs-router 的完整 API 参考文档。
+本版本公开四个入口，见[兼容性](../guide/compatibility.md) 的导出表。根入口是浏览器可用的 hook 和路径解析；构建插件应从对应子路径导入。
 
-## 插件 API
+- [插件 API](./plugins.md)：Vite / Webpack / Rspack 工厂。
+- [Hook API](./hooks.md)：类型约束的路径构建与导航。
+- [类型定义](./types.md)：实际导出与声明合并。
 
-- [插件配置](./plugins.md) - 所有插件配置选项
-- [Hook API](./hooks.md) - 自定义 Hook 文档
-- [类型定义](./types.md) - TypeScript 类型定义
-
-## 快速导航
-
-| API 类型 | 描述 | 链接 |
-|---------|------|------|
-| 插件配置 | Vite、Webpack、Rspack 插件配置选项 | [查看详情](./plugins.md) |
-| Hook API | 路由相关的自定义 Hook | [查看详情](./hooks.md) |
-| 类型定义 | TypeScript 接口和类型 | [查看详情](./types.md) |
+本库不导出 RouterProvider、BrowserRouter、RouteExtractor 或自定义生成器。Router 组件与 loader 参数类型从 `react-router-dom` 获取。

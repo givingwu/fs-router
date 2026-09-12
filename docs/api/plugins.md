@@ -1,97 +1,20 @@
 # 插件 API
 
-@feoe/fs-router 为不同的构建工具提供了插件支持。
-
-## Vite 插件
-
-### FileBasedRouterVite
-
-```typescript
-import { FileBasedRouterVite } from '@feoe/fs-router/vite'
-
-export interface PluginConfig {
-  /** 路由文件目录 */
-  routesDirectory: string
-  /** 生成的路由文件路径 */
-  generatedRoutesPath: string
-  /** 路由文件扩展名 */
-  routeExtensions?: string[]
-  /** 是否启用路由生成 */
-  enableGeneration?: boolean
-  /** 路径别名配置 */
-  alias?: {
-    name: string
-    basename: string
-  }
-  /** 是否启用代码分割 */
-  splitting?: boolean
-  /** 是否启用默认错误边界 */
-  defaultErrorBoundary?: boolean
-  /** 类型生成选项 */
-  typeGenerateOptions?: TypeGenerateOptions
-}
+```ts
+import vitePlugin, { FileBasedRouterVite, type PluginConfig } from '@feoe/fs-router/vite';
+import rspackPlugin, { FileBasedRouterRspack } from '@feoe/fs-router/rspack';
+import webpackPlugin, { FileBasedRouterWebpack } from '@feoe/fs-router/webpack';
 ```
 
-### 配置示例
+每个入口的默认导出与对应具名导出是同一个插件工厂，接受 `Partial<PluginConfig>`；未传参数使用默认扫描路径。仅将匹配当前构建器的插件放入其 plugins 列表。
 
-```typescript
-// vite.config.ts
-export default defineConfig({
-  plugins: [
-    FileBasedRouterVite({
-      routesDirectory: 'src/routes',
-      generatedRoutesPath: 'src/routes.tsx',
-      enableGeneration: true,
-      typeGenerateOptions: {
-        routesTypeFile: 'src/routes-type.ts'
-      }
-    })
-  ]
-})
+CommonJS 配置使用 `.cjs` 扩展名，并通过 `.default` 取默认导出：
+
+```js
+const fileBasedRouter = require('@feoe/fs-router/webpack').default;
+module.exports = { plugins: [fileBasedRouter()] };
 ```
 
-## Rspack 插件
+上例仅展示插件位置；运行项目仍需入口、TSX loader、扩展名解析、HTML 与部署回退配置。不要在 `type: "module"` 项目的 `.js` 文件里直接使用 require。
 
-### FileBasedRouterRspack
-
-```typescript
-const { FileBasedRouterRspack } = require('@feoe/fs-router/rspack')
-
-// 使用相同的 PluginConfig 接口
-export type RspackPluginOptions = PluginConfig
-```
-
-## Webpack 插件
-
-### FileBasedRouterWebpack
-
-```typescript
-const { FileBasedRouterWebpack } = require('@feoe/fs-router/webpack')
-
-// 使用相同的 PluginConfig 接口
-export type WebpackPluginOptions = PluginConfig
-```
-
-## 通用配置选项
-
-### TypeGenerateOptions
-
-```typescript
-interface TypeGenerateOptions {
-  /** 类型文件输出路径 */
-  routesTypeFile: string
-  /** 是否生成路由参数类型 */
-  generateRouteParams?: boolean
-  /** 是否生成 Loader 类型 */
-  generateLoaderTypes?: boolean
-  /** 路由目录配置（仅 Rspack） */
-  routesDirectories?: RouteDirectory[]
-}
-
-interface RouteDirectory {
-  /** 路由前缀 */
-  prefix?: string
-  /** 路由目录路径 */
-  path: string
-}
-```
+[配置字段](../guide/configuration/plugin-options.md) 是唯一配置参考；[Vite](../examples/vite-integration.md)、[Rspack](../examples/rspack-integration.md)、[Webpack](../examples/webpack-integration.md) 提供完整可运行入口。

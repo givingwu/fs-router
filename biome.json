@@ -10,6 +10,7 @@
 			"src/**",
 			"tests/**/*.test.ts",
 			"tests/consumers/verify.mjs",
+			"tests/browser/**",
 			"scripts/**",
 			"*.json",
 			"*.ts",

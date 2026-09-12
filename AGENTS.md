@@ -61,7 +61,7 @@ src/
 | `layout.data.ts` | 布局数据加载器 |
 | `loading.tsx` | 加载状态组件 |
 | `error.tsx` | 错误边界组件 |
-| `loader.ts` | 数据加载器 (Remix 风格) |
+| `page.loader.ts` / `layout.loader.ts` | 默认导出的数据加载器；独立 `loader.ts` 不支持 |
 
 ### 动态路由语法
 

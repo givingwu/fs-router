@@ -76,21 +76,27 @@
 		"test:watch": "vitest",
 		"prepare": "simple-git-hooks",
 		"prepublishOnly": "pnpm check && pnpm typecheck && pnpm test && pnpm check:consumers",
-		"docs:dev": "rspress dev docs",
-		"docs:build": "rspress build docs --config docs/.rspress/config.ts",
-		"docs:preview": "rspress preview docs",
+		"docs:dev": "rspress dev --config docs/.rspress/config.ts",
+		"docs:build": "rspress build --config docs/.rspress/config.ts",
+		"docs:preview": "rspress preview --config docs/.rspress/config.ts",
 		"check": "biome ci --error-on-warnings .",
 		"check:fix": "biome check --write .",
 		"typecheck": "tsc --project tsconfig.check.json --noEmit",
 		"docs:check": "node scripts/check-docs.mjs",
 		"check:package": "node scripts/check-package.mjs",
 		"check:consumers": "node scripts/check-consumers.mjs",
-		"prepack": "pnpm build && pnpm check:package"
+		"prepack": "pnpm build && pnpm check:package",
+		"docs:smoke": "playwright test --config tests/browser/docs.config.ts",
+		"example:setup": "node scripts/setup-example.mjs",
+		"example:check": "npm --prefix examples/minimal-react run build:all",
+		"example:smoke": "playwright test --config tests/browser/example.config.ts"
 	},
 	"devDependencies": {
+		"@axe-core/playwright": "4.13.0",
 		"@biomejs/biome": "2.5.13",
 		"@loadable/component": "5.16.7",
 		"@microsoft/api-extractor": "7.59.1",
+		"@playwright/test": "1.63.0",
 		"@rslib/core": "^0.4.1",
 		"@rspack/core": "1.7.12",
 		"@rspress/theme-default": "^1.47.2",
@@ -115,13 +121,13 @@
 	},
 	"peerDependencies": {
 		"@loadable/component": "^5.16.7",
+		"@rspack/core": "^1.7.12",
 		"@types/react": "^18.3.31 || ^19.2.0",
 		"react": "^18.3.1 || ^19.2.8",
 		"react-dom": "^18.3.1 || ^19.2.8",
 		"react-router-dom": "^7.18.3",
 		"vite": "^6.4.3",
-		"webpack": "^5.110.3",
-		"@rspack/core": "^1.7.12"
+		"webpack": "^5.110.3"
 	},
 	"license": "MIT",
 	"packageManager": "pnpm@10.34.5",
@@ -131,6 +137,9 @@
 	"pnpm": {
 		"overrides": {
 			"refractor@3>prismjs": "1.30.0"
+		},
+		"patchedDependencies": {
+			"@rspress/theme-default@1.47.2": "patches/@rspress__theme-default@1.47.2.patch"
 		}
 	},
 	"peerDependenciesMeta": {
