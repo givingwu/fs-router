@@ -53,6 +53,8 @@ pnpm check:consumers
 
 `examples/minimal-react` 已加入三种构建器、严格类型和 Chromium 页面检查。旧大型示例的独立依赖与 UI 不属于矩阵，根包结果不能替代其安全验证。文档与最小示例的命令见[快速开始](./start/getting-started.md)。
 
+最小示例固定 React/React DOM 18.3.1、类型 18.3.31/18.3.7、Vite 6.4.3 和 React 插件 4.7.0。2026-09-12 的收尾修复恢复了这套已验证组合：独立依赖 PR 曾引入 React 19/DOM 18 混用，以及超出插件和本库 peer 范围的 Vite 8。示例选择不改变上表 React 18/19 的库消费者覆盖。Vite 6.4 在本次核验时仍接收官方安全补丁；未来主版本迁移需同时调整 peer、锁文件及验证矩阵，不能只更新示例版本号。
+
 ## 核验来源
 
 - [Node 发布与支持周期](https://nodejs.org/en/about/previous-releases)：选择 22/24 LTS；最低版本测试不代表推荐使用旧安全补丁。

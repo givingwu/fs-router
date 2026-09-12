@@ -5,14 +5,45 @@ updates:
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    # Major migrations need a coordinated peer/matrix review. Security updates
+    # are not filtered by update-types; do not add blanket versions ignores.
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
     groups:
       compatible-dependencies:
+        patterns: ['*']
         update-types: [minor, patch]
+      security-dependencies:
+        applies-to: security-updates
+        patterns: ['*']
   - package-ecosystem: npm
     directory: /examples/minimal-react
     schedule:
       interval: weekly
     open-pull-requests-limit: 3
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+    groups:
+      # Cross dependencies/devDependencies: runtime and declarations belong together.
+      react-family:
+        patterns: [react, react-dom, '@types/react', '@types/react-dom']
+        update-types: [minor, patch]
+      build-toolchain:
+        patterns:
+          - vite
+          - '@vitejs/plugin-react'
+          - '@rspack/core'
+          - webpack
+          - ts-loader
+          - html-webpack-plugin
+          - typescript
+          - '@types/node'
+        update-types: [minor, patch]
+      security-dependencies:
+        applies-to: security-updates
+        patterns: ['*']
   - package-ecosystem: github-actions
     directory: /
     schedule:

@@ -26,6 +26,8 @@ npm --prefix examples/minimal-react run preview
 
 源码：[examples/minimal-react](https://github.com/givingwu/fs-router/tree/main/examples/minimal-react)。[支持矩阵](../compatibility.md) 列出实际版本。
 
+示例使用配对的 React/React DOM 18.3.1、类型 18.3.31/18.3.7 与 Vite 6.4.3/React 插件 4.7.0。更新时应成套核对 peer 范围；库的 React 19.2.8 支持由独立 tarball 消费者验证，不能混装 React 19 与 DOM 18。主版本升级流程见[依赖更新](../../contributing/development.md#依赖更新)。
+
 ## 接入已有 Vite 应用
 
 在仓库根目录完成 `example:setup` 后，将 `.artifacts/feoe-fs-router-0.1.0.tgz` 复制到应用目录，安装它及 peer 依赖：
