@@ -33,5 +33,10 @@
     "type": "file",
     "name": "compatibility",
     "label": "兼容性与限制"
+  },
+  {
+    "type": "file",
+    "name": "choosing",
+    "label": "如何选型"
   }
 ]

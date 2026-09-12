@@ -13,5 +13,20 @@
     "type": "file",
     "name": "release",
     "label": "发布流程"
+  },
+  {
+    "type": "file",
+    "name": "first-contribution",
+    "label": "入门任务"
+  },
+  {
+    "type": "file",
+    "name": "communication",
+    "label": "演示与介绍草稿"
+  },
+  {
+    "type": "file",
+    "name": "adoption",
+    "label": "采用计划"
   }
 ]

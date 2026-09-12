@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security reporting / 漏洞报告
+    url: https://github.com/givingwu/fs-router/blob/main/SECURITY.md
+    about: Read the security policy before sharing vulnerability details.
+  - name: Support and trial feedback / 支持与试用反馈
+    url: https://github.com/givingwu/fs-router/blob/main/SUPPORT.md
+    about: Questions and unsuccessful trials are welcome in a blank issue.
+  - name: Conduct reporting / 行为问题报告
+    url: https://github.com/givingwu/fs-router/blob/main/CODE_OF_CONDUCT.md
+    about: Use the conduct contact or GitHub reporting route; do not post private reports publicly.
