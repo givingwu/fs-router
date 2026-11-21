@@ -1,4 +1,5 @@
-import { isAbsolute, relative, sep } from "node:path";
+import { existsSync } from "node:fs";
+import { dirname, isAbsolute, relative, sep } from "node:path";
 import type { UnpluginFactory, UnpluginOptions } from "unplugin";
 import { getConfig, type PluginConfig } from "./config";
 import { generator } from "./generator";
@@ -36,6 +37,22 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 			const rel = relative(directory, file);
 			return rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
 		});
+	};
+	// Watchpack watches the nearest existing ancestor of a missing context
+	// dependency, so directories created later still trigger rebuilds. Rspack's
+	// native watcher drops events for paths missing from its registered set
+	// (web-infra-dev/rspack#12904), so a route directory that did not exist when
+	// watching started would never be detected after creation. Resolve to the
+	// nearest ancestor that exists today; the afterCompile of the recovered
+	// build switches back to directory-scoped watching.
+	const watchableAncestor = (directory: string) => {
+		let current = directory;
+		for (;;) {
+			const parent = dirname(current);
+			if (parent === current) return undefined;
+			if (existsSync(parent)) return parent;
+			current = parent;
+		}
 	};
 	const setRoot = (value: string) => {
 		root = value;
@@ -79,8 +96,12 @@ export const unpluginRouterGeneratorFactory: UnpluginFactory<
 		);
 		compiler.hooks.afterCompile.tap(PLUGIN_NAME, (compilation) => {
 			if (!config.enableGeneration) return;
-			for (const directory of routeDirectories())
+			for (const directory of routeDirectories()) {
 				compilation.contextDependencies.add(directory);
+				if (existsSync(directory)) continue;
+				const ancestor = watchableAncestor(directory);
+				if (ancestor) compilation.contextDependencies.add(ancestor);
+			}
 		});
 	};
 
